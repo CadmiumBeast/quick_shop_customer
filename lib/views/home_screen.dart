@@ -63,9 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Profile',
           ),
         ],
-        currentIndex: _selectedIndex, // This will highlight the selected item
+        currentIndex: _selectedIndex, 
         selectedItemColor: Colors.blue,
-        onTap: _onItemTapped, // Update the index on tap
+        onTap: _onItemTapped, 
       ),
     );
   }
