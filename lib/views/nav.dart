@@ -5,12 +5,12 @@ import 'login_screen.dart';
 import 'home_content_screen.dart';
 import 'profile_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class nav extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<nav> {
   final ApiService _apiService = ApiService();
   int _selectedIndex = 0;
 
@@ -63,9 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Profile',
           ),
         ],
-        currentIndex: _selectedIndex, 
+        currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
-        onTap: _onItemTapped, 
+        onTap: _onItemTapped,
       ),
     );
   }

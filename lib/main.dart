@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'services/api_service.dart';
 import 'views/login_screen.dart';
-import 'views/home_screen.dart';
+import 'views/nav.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
             return Center(child: CircularProgressIndicator());
           } else {
             if (snapshot.data != null) {
-              return HomeScreen();
+              return nav();
             } else {
               return LoginScreen();
             }
