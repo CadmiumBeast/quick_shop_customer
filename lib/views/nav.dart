@@ -3,6 +3,7 @@ import '../services/api_service.dart';
 import 'cart_screen.dart';
 import 'login_screen.dart';
 import 'home_content_screen.dart';
+import 'tshirt_listing_screen.dart';
 import 'profile_screen.dart';
 
 class nav extends StatefulWidget {
@@ -16,6 +17,7 @@ class _HomeScreenState extends State<nav> {
 
   static List<Widget> _screens = <Widget>[
     HomeContentScreen(),
+    TshirtListingScreen(),
     CartScreen(),
     ProfileScreen(),
   ];
@@ -55,6 +57,10 @@ class _HomeScreenState extends State<nav> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart_checkout),
             label: 'Cart',
           ),
@@ -64,6 +70,7 @@ class _HomeScreenState extends State<nav> {
           ),
         ],
         currentIndex: _selectedIndex,
+        unselectedItemColor: const Color.fromARGB(255, 37, 37, 37),
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
       ),
