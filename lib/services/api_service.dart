@@ -47,7 +47,47 @@ class ApiService {
       throw Exception(responseData['message'] ?? 'Failed to log in');
     }
   }
+  // Fetch Profile API
+  Future<Map<String, dynamic>> fetchProfile() async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
 
+        final response = await http.get(
+            Uri.parse('$baseUrl/profile'),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+            },
+        );
+
+        if (response.statusCode == 200) {
+            return json.decode(response.body);
+        } else {
+            throw Exception('Failed to load profile');
+        }
+    }
+
+    // Update Profile API
+    Future<void> updateProfile(String name, String email) async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
+
+        final response = await http.put(
+            Uri.parse('$baseUrl/profile'),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+            },
+            body: json.encode({
+                'name': name,
+                'email': email,
+            }),
+        );
+
+        if (response.statusCode != 200) {
+            throw Exception('Failed to update profile');
+        }
+    }
   // Method to retrieve token from SharedPreferences
   Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -97,56 +137,5 @@ class ApiService {
       throw Exception('Failed to add t-shirt to cart');
     }
   }
-  // Add to Cart API
-  // Future<void> addToCart(int productId) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token');
-
-  //   if (token != null) {
-  //     final response = await http.post(
-  //       Uri.parse('$baseUrl/cart'),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //       body: json.encode({'product_id': productId}),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       print('Product added to cart successfully');
-  //     } else {
-  //       final responseData = json.decode(response.body);
-  //       throw Exception(
-  //           responseData['message'] ?? 'Failed to add product to cart');
-  //     }
-  //   } else {
-  //     throw Exception('User is not authenticated');
-  //   }
-  // }
-
-  // Remove from Cart API
-  Future<void> removeFromCart(int productId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token != null) {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/cart/$productId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        print('Product removed from cart successfully');
-      } else {
-        final responseData = json.decode(response.body);
-        throw Exception(
-            responseData['message'] ?? 'Failed to remove product from cart');
-      }
-    } else {
-      throw Exception('User is not authenticated');
-    }
-  }
+ 
 }
