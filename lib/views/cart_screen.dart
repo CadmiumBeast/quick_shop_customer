@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/Product.dart';
 import '../services/api_service.dart';
+import '../services/stripe_service.dart';
 import 'update_cart_screen.dart';
 
 class CartScreen extends StatefulWidget {
@@ -77,17 +78,23 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
-  // Method to handle purchase
+  // Method to handle purchase via API service after Stripe payment
   void _purchaseItems() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      await _apiService.purchaseCart(); // Call the purchase API
+      // Process payment through Stripe
+      await StripeService.instance.makePayment();
+
+      // Call API to complete purchase and clear the cart
+      await _apiService.purchaseCart();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Purchase successful!')),
       );
+
       _fetchCartItems(); // Refresh the cart after purchase
     } catch (e) {
       setState(() {
@@ -186,7 +193,7 @@ class _CartScreenState extends State<CartScreen> {
                           child: ElevatedButton(
                             onPressed: _cartItems.isEmpty
                                 ? null
-                                : _purchaseItems, // Disable if cart is empty
+                                : _purchaseItems, // Call the payment method
                             child: Text('Purchase'),
                           ),
                         ),
