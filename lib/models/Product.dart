@@ -5,7 +5,7 @@ class Product {
   final String size;
   final double price;
   final int stock;
-  final String? image; // Add an optional image property
+  final int quantity;
 
   Product({
     required this.id,
@@ -14,18 +14,19 @@ class Product {
     required this.size,
     required this.price,
     required this.stock,
-    this.image, // Initialize image property
+    required this.quantity,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'],
-      name: json['name'],
-      color: json['color'],
-      size: json['size'],
-      price: double.parse(json['price'].toString()),
-      stock: json['stock'],
-      image: json['image'] != null ? json['image'] : null, // Handle null image
+      id: json['id'] ?? 0, // Default to 0 if id is null
+      name: json['name'] ?? 'Unknown', // Provide a default value for name
+      color: json['color'] ?? 'N/A', // Default color
+      size: json['size'] ?? 'N/A', // Default size
+      price: double.tryParse(json['price'].toString()) ??
+          0.0, // Default to 0.0 if parsing fails
+      stock: json['stock'] ?? 0, // Default stock to 0
+      quantity: json['quantity'] ?? 1, // Default quantity to 1
     );
   }
 }

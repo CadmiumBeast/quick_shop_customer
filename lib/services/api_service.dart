@@ -140,54 +140,60 @@ class ApiService {
     }
   }
 
-  // Fetch T-shirts API (requires authentication)
+  // Fetch all available T-shirts (products) from the backend
   Future<List<Product>> fetchTshirts() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
+    final token = await getToken();
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('User not authenticated');
     }
 
     final response = await http.get(
       Uri.parse('$baseUrl/tshirts'),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token', // Make sure token is valid and sent
+        'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((tshirt) => Product.fromJson(tshirt)).toList();
+      final List data = json.decode(response.body);
+      return data.map((json) => Product.fromJson(json)).toList();
     } else {
-      print('Error: ${response.body}');
-      throw Exception('Failed to load t-shirts');
+      throw Exception('Failed to load T-shirts');
     }
   }
 
-  // Add T-shirt to cart
-  Future<void> addToCart(int tshirtId, int quantity) async {
-    final token = await getToken();
-    if (token == null) throw Exception('User not authenticated');
+  // Add to Cart
+  Future<void> addToCart(int productId, int quantity) async {
+    final token = await getToken(); // Fetch the token from SharedPreferences
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/cart/add/$tshirtId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'quantity': quantity}),
-    );
+    final url = Uri.parse('$baseUrl/cart/add/$productId');
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to add to cart');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Use the token here
+        },
+        body: jsonEncode({'quantity': quantity}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to add to cart: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Failed to add to cart: $e');
     }
   }
 
-  // View Cart
+  // Fetch cart items
   Future<List<dynamic>> viewCart() async {
-    final token = await getToken();
+    final token = await getToken(); // Method to get user's token
     if (token == null) throw Exception('User not authenticated');
 
     final response = await http.get(
@@ -198,9 +204,16 @@ class ApiService {
       },
     );
 
+    // Log the full response body to console
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final data = json.decode(response.body); // Decode the JSON response
+      print('Decoded data: $data'); // Log the decoded data
+      return data; // Return the cart items
     } else {
+      print('Failed to load cart with status: ${response.statusCode}');
       throw Exception('Failed to load cart');
     }
   }

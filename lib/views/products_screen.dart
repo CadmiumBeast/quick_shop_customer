@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
 import '../models/Product.dart';
-import 'add_to_cart_screen.dart'; // Import the new AddToCartScreen
+import '../services/api_service.dart';
+import 'add_to_cart_screen.dart'; // Import the AddToCartScreen
 
-class ProductsScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
+  final String token; // User's authentication token
+
+  HomeScreen({required this.token});
+
   @override
   _ProductsScreenState createState() => _ProductsScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> {
+class _ProductsScreenState extends State<HomeScreen> {
   final ApiService _apiService = ApiService();
   late Future<List<Product>> _tshirtFuture;
 
@@ -47,11 +51,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 final product = products[index];
                 return GestureDetector(
                   onTap: () {
-                    // Navigate to the AddToCartScreen and pass the selected product
+                    // Navigate to AddToCartScreen and pass the selected product and token
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddToCartScreen(product: product),
+                        builder: (context) => AddToCartScreen(
+                          product: product,
+                          token: widget.token,
+                        ),
                       ),
                     );
                   },

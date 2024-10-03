@@ -4,8 +4,9 @@ import '../services/api_service.dart';
 
 class AddToCartScreen extends StatefulWidget {
   final Product product;
+  final String token; // User's authentication token
 
-  AddToCartScreen({required this.product});
+  AddToCartScreen({required this.product, required this.token});
 
   @override
   _AddToCartScreenState createState() => _AddToCartScreenState();
@@ -14,18 +15,28 @@ class AddToCartScreen extends StatefulWidget {
 class _AddToCartScreenState extends State<AddToCartScreen> {
   final ApiService _apiService = ApiService();
   int _quantity = 1; // Default quantity
+  bool _isLoading = false; // Loading state for API call
 
   void _addToCart() async {
+    setState(() {
+      _isLoading = true; // Show loader during the API call
+    });
+
     try {
+      // Call the API service to add the product to the cart
       await _apiService.addToCart(widget.product.id, _quantity);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Added to cart successfully!')),
       );
-      Navigator.pop(context); // Go back after adding to cart
+      Navigator.pop(context); // Navigate back after adding to cart
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add to cart: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loader after the API call
+      });
     }
   }
 
@@ -86,10 +97,14 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
             Spacer(),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _addToCart,
-                child: Text('Add to Cart'),
-              ),
+              child: _isLoading
+                  ? Center(
+                      child:
+                          CircularProgressIndicator()) // Show loader when API is being called
+                  : ElevatedButton(
+                      onPressed: _addToCart,
+                      child: Text('Add to Cart'),
+                    ),
             ),
           ],
         ),
