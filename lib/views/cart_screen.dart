@@ -35,7 +35,8 @@ class _CartScreenState extends State<CartScreen> {
             price: double.parse(tshirt['price']),
             stock: tshirt['stock'],
             quantity: item['quantity'],
-            cartItemId: item['id'], // Assuming your API returns the cart item ID
+            cartItemId:
+                item['id'], // Assuming your API returns the cart item ID
           );
         }).toList();
         _isLoading = false; // Stop loading after fetching items
@@ -52,7 +53,8 @@ class _CartScreenState extends State<CartScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UpdateCartScreen(product: product), // Pass the product to UpdateCartScreen
+        builder: (context) => UpdateCartScreen(
+            product: product), // Pass the product to UpdateCartScreen
       ),
     ).then((value) {
       // Refresh the cart items after returning from UpdateCartScreen
@@ -74,7 +76,8 @@ class _CartScreenState extends State<CartScreen> {
                   child: Text('Error: $_errorMessage')) // Show error message
               : _cartItems.isEmpty
                   ? Center(
-                      child: Text('Your cart is empty!')) // No items in the cart
+                      child:
+                          Text('Your cart is empty!')) // No items in the cart
                   : ListView.builder(
                       itemCount: _cartItems.length,
                       itemBuilder: (context, index) {
@@ -117,10 +120,12 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 SizedBox(height: 10),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     ElevatedButton(
-                                      onPressed: () => _navigateToUpdateCart(product), // Navigate to update screen
+                                      onPressed: () => _navigateToUpdateCart(
+                                          product), // Navigate to update screen
                                       child: Text('Update'),
                                     ),
                                     ElevatedButton(

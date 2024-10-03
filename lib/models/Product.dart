@@ -25,10 +25,12 @@ class Product {
       name: json['name'] ?? 'Unknown', // Provide a default value for name
       color: json['color'] ?? 'N/A', // Default color
       size: json['size'] ?? 'N/A', // Default size
-      price: double.tryParse(json['price'].toString()) ?? 0.0, // Default to 0.0 if parsing fails
+      price: double.tryParse(json['price'].toString()) ??
+          0.0, // Default to 0.0 if parsing fails
       stock: json['stock'] ?? 0, // Default stock to 0
       quantity: json['quantity'] ?? 1, // Default quantity to 1
-      cartItemId: json['cart_item_id'] ?? 0, // Assuming your API returns cart item ID
+      cartItemId:
+          json['cart_item_id'] ?? 0, // Assuming your API returns cart item ID
     );
   }
 }

@@ -13,15 +13,14 @@ class UpdateCartScreen extends StatefulWidget {
 
 class _UpdateCartScreenState extends State<UpdateCartScreen> {
   final ApiService _apiService = ApiService();
-  late TextEditingController _quantityController;
+  int _quantity = 1; // Initialize quantity to 1
   bool _isLoading = false;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _quantityController =
-        TextEditingController(text: widget.product.quantity.toString());
+    _quantity = widget.product.quantity; // Set initial quantity from product
   }
 
   // Method to update the cart item
@@ -32,13 +31,11 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
     });
 
     try {
-      final quantity = int.tryParse(_quantityController.text);
-      if (quantity == null || quantity <= 0) {
+      if (_quantity <= 0) {
         throw Exception('Please enter a valid quantity');
       }
 
-      await _apiService.updateCartItem(widget.product.cartItemId, quantity);
-
+      await _apiService.updateCartItem(widget.product.cartItemId, _quantity);
       Navigator.pop(context); // Return to the previous screen after updating
     } catch (e) {
       setState(() {
@@ -74,13 +71,34 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 20),
-            TextField(
-              controller: _quantityController,
-              decoration: InputDecoration(
-                labelText: 'Quantity',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+            // Using a Stepper for quantity selection
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Quantity: $_quantity', style: TextStyle(fontSize: 18)),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        if (_quantity > 1) {
+                          setState(() {
+                            _quantity--;
+                          });
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        setState(() {
+                          _quantity++;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
             SizedBox(height: 20),
             _errorMessage != null
@@ -92,8 +110,8 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
             SizedBox(height: 20),
             _isLoading
                 ? Center(
-                    child:
-                        CircularProgressIndicator()) // Show loader while updating
+                    child: CircularProgressIndicator(),
+                  ) // Show loader while updating
                 : ElevatedButton(
                     onPressed: _updateCart,
                     child: Text('Update Cart'),
