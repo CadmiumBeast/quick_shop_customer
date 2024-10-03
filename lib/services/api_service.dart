@@ -251,8 +251,8 @@ class ApiService {
       },
       body: json.encode({'quantity': quantity}),
     );
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    //print('Response status: ${response.statusCode}');
+    //print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update cart item');
@@ -260,17 +260,19 @@ class ApiService {
   }
 
   // Clear the cart
-  Future<void> clearCart() async {
+  Future<void> clearCart(int cartItemId) async {
     final token = await getToken();
     if (token == null) throw Exception('User not authenticated');
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/cart/clear'),
+      Uri.parse('$baseUrl/cart/clear/$cartItemId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
     );
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to clear cart');

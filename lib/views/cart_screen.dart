@@ -49,6 +49,28 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  // Method to remove an item from the cart
+  void _removeCartItem(int cartItemId) async {
+    setState(() {
+      _isLoading = true; // Show loading while the deletion is in progress
+    });
+
+    try {
+      await _apiService
+          .removeFromCart(cartItemId); // Call the API to remove item
+      _fetchCartItems(); // Refresh the cart after the item is removed
+    } catch (e) {
+      setState(() {
+        _errorMessage =
+            e.toString(); // Show error message if something goes wrong
+      });
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading once the operation is done
+      });
+    }
+  }
+
   void _navigateToUpdateCart(Product product) {
     Navigator.push(
       context,
@@ -99,9 +121,7 @@ class _CartScreenState extends State<CartScreen> {
                                 SizedBox(height: 5),
                                 Text(
                                   'Color: ${product.color}',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
+                                  style: TextStyle(fontSize: 16),
                                 ),
                                 SizedBox(height: 5),
                                 Text(
@@ -114,9 +134,7 @@ class _CartScreenState extends State<CartScreen> {
                                 SizedBox(height: 5),
                                 Text(
                                   'Quantity: ${product.quantity}',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
+                                  style: TextStyle(fontSize: 16),
                                 ),
                                 SizedBox(height: 10),
                                 Row(
@@ -124,13 +142,14 @@ class _CartScreenState extends State<CartScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     ElevatedButton(
-                                      onPressed: () => _navigateToUpdateCart(
-                                          product), // Navigate to update screen
+                                      onPressed: () =>
+                                          _navigateToUpdateCart(product),
                                       child: Text('Update'),
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Here you can implement the delete functionality if required
+                                        _removeCartItem(product
+                                            .cartItemId!); // Call delete function
                                       },
                                       child: Text('Delete'),
                                     ),
