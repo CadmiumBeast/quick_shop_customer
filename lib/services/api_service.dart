@@ -271,11 +271,33 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
+    //print('Response status: ${response.statusCode}');
+    //print('Response body: ${response.body}');
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to clear cart');
+    }
+  }
+
+  Future<void> purchaseCart() async {
+    final token = await getToken(); // Get the token from SharedPreferences
+    if (token == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/cart/purchase'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // Pass the token
+      },
+    );
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to clear cart');
+      final responseData = jsonDecode(response.body);
+      throw Exception('Purchase failed: ${responseData['message']}');
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/Product.dart'; // Import your Product model
+import '../models/Product.dart';
 import '../services/api_service.dart';
-import 'update_cart_screen.dart'; // Import the UpdateCartScreen
+import 'update_cart_screen.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -17,16 +17,15 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchCartItems(); // Fetch cart items when the screen is initialized
+    _fetchCartItems();
   }
 
-  // Method to fetch cart items
   void _fetchCartItems() async {
     try {
       final cartItems = await _apiService.viewCart();
       setState(() {
         _cartItems = cartItems.map((item) {
-          final tshirt = item['tshirt']; // Access the 'tshirt' object
+          final tshirt = item['tshirt'];
           return Product(
             id: tshirt['id'],
             name: tshirt['name'],
@@ -35,38 +34,34 @@ class _CartScreenState extends State<CartScreen> {
             price: double.parse(tshirt['price']),
             stock: tshirt['stock'],
             quantity: item['quantity'],
-            cartItemId:
-                item['id'], // Assuming your API returns the cart item ID
+            cartItemId: item['id'],
           );
         }).toList();
-        _isLoading = false; // Stop loading after fetching items
+        _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _isLoading = false; // Stop loading in case of an error
-        _errorMessage = e.toString(); // Set the error message
+        _isLoading = false;
+        _errorMessage = e.toString();
       });
     }
   }
 
-  // Method to remove an item from the cart
   void _removeCartItem(int cartItemId) async {
     setState(() {
-      _isLoading = true; // Show loading while the deletion is in progress
+      _isLoading = true;
     });
 
     try {
-      await _apiService
-          .removeFromCart(cartItemId); // Call the API to remove item
-      _fetchCartItems(); // Refresh the cart after the item is removed
+      await _apiService.removeFromCart(cartItemId);
+      _fetchCartItems();
     } catch (e) {
       setState(() {
-        _errorMessage =
-            e.toString(); // Show error message if something goes wrong
+        _errorMessage = e.toString();
       });
     } finally {
       setState(() {
-        _isLoading = false; // Stop loading once the operation is done
+        _isLoading = false;
       });
     }
   }
@@ -75,13 +70,37 @@ class _CartScreenState extends State<CartScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UpdateCartScreen(
-            product: product), // Pass the product to UpdateCartScreen
+        builder: (context) => UpdateCartScreen(product: product),
       ),
     ).then((value) {
-      // Refresh the cart items after returning from UpdateCartScreen
       _fetchCartItems();
     });
+  }
+
+  // Method to handle purchase
+  void _purchaseItems() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _apiService.purchaseCart(); // Call the purchase API
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Purchase successful!')),
+      );
+      _fetchCartItems(); // Refresh the cart after purchase
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Purchase failed: $_errorMessage')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -91,75 +110,87 @@ class _CartScreenState extends State<CartScreen> {
         title: Text('Cart'),
       ),
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator()) // Show loader while fetching
+          ? Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? Center(
-                  child: Text('Error: $_errorMessage')) // Show error message
+              ? Center(child: Text('Error: $_errorMessage'))
               : _cartItems.isEmpty
-                  ? Center(
-                      child:
-                          Text('Your cart is empty!')) // No items in the cart
-                  : ListView.builder(
-                      itemCount: _cartItems.length,
-                      itemBuilder: (context, index) {
-                        final product = _cartItems[index];
-                        return Card(
-                          margin: EdgeInsets.all(10),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.name,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                  ? Center(child: Text('Your cart is empty!'))
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: _cartItems.length,
+                            itemBuilder: (context, index) {
+                              final product = _cartItems[index];
+                              return Card(
+                                margin: EdgeInsets.all(10),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product.name,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        'Color: ${product.color}',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        'Price: \$${product.price.toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        'Quantity: ${product.quantity}',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () =>
+                                                _navigateToUpdateCart(product),
+                                            child: Text('Update'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _removeCartItem(
+                                                  product.cartItemId!);
+                                            },
+                                            child: Text('Delete'),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'Color: ${product.color}',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'Price: \$${product.price.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'Quantity: ${product.quantity}',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () =>
-                                          _navigateToUpdateCart(product),
-                                      child: Text('Update'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        _removeCartItem(product
-                                            .cartItemId!); // Call delete function
-                                      },
-                                      child: Text('Delete'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ElevatedButton(
+                            onPressed: _cartItems.isEmpty
+                                ? null
+                                : _purchaseItems, // Disable if cart is empty
+                            child: Text('Purchase'),
+                          ),
+                        ),
+                      ],
                     ),
     );
   }
