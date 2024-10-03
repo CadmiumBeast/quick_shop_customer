@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'cart_screen.dart';
 import 'home_content_screen.dart';
-import 'tshirt_listing_screen.dart';
+import 'products_screen.dart';
 import 'profile_screen.dart';
 
 class nav extends StatefulWidget {
@@ -14,7 +14,7 @@ class _HomeScreenState extends State<nav> {
 
   static List<Widget> _screens = <Widget>[
     HomeContentScreen(),
-    TshirtListingScreen(),
+    ProductsScreen(),
     CartScreen(),
     ProfilePage(),
   ];
