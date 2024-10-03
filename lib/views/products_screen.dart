@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/api_service.dart';
 import '../models/Product.dart';
+import 'add_to_cart_screen.dart'; // Import the new AddToCartScreen
 
 class ProductsScreen extends StatefulWidget {
   @override
@@ -28,32 +28,63 @@ class _ProductsScreenState extends State<ProductsScreen> {
         future: _tshirtFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show a loading spinner while fetching data
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // Handle any errors
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            // Handle the case when no data is available
             return Center(child: Text('No T-Shirts available'));
           } else {
-            // Display the list of T-shirts in cards
             final products = snapshot.data!;
-            return ListView.builder(
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.5,
+              ),
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  child: ListTile(
-                    leading: FaIcon(FontAwesomeIcons.tshirt),
-                    title: Text(product.name),
-                    subtitle:
-                        Text('Color: ${product.color} | Size: ${product.size}'),
-                    trailing: Text('\$${product.price.toStringAsFixed(2)}'),
-                    onTap: () {
-                      // Handle card tap (optional, e.g., navigate to details)
-                    },
+                return GestureDetector(
+                  onTap: () {
+                    // Navigate to the AddToCartScreen and pass the selected product
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddToCartScreen(product: product),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: EdgeInsets.all(10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Color: ${product.color} | Size: ${product.size}',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Spacer(),
+                          Text(
+                            '\$${product.price.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },

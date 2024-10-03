@@ -64,6 +64,28 @@ class ApiService {
     }
   }
 
+  // Logout API
+  Future<void> logout() async {
+    try {
+      final token = await getToken();
+
+      if (token != null) {
+        await http.post(
+          Uri.parse('$baseUrl/logout'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove('token');
+      }
+    } catch (e) {
+      print('Error logging out: $e');
+      throw Exception('Logout error: $e');
+    }
+  }
+
   // Fetch Profile API
   Future<Map<String, dynamic>> fetchProfile() async {
     try {
@@ -118,54 +140,6 @@ class ApiService {
     }
   }
 
-  // Logout API
-  Future<void> logout() async {
-    try {
-      final token = await getToken();
-
-      if (token != null) {
-        await http.post(
-          Uri.parse('$baseUrl/logout'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-        );
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.remove('token');
-      }
-    } catch (e) {
-      print('Error logging out: $e');
-      throw Exception('Logout error: $e');
-    }
-  }
-
-  // View Cart API
-  Future<List<dynamic>> viewCart() async {
-    try {
-      final token = await getToken();
-
-      if (token == null) throw Exception('User is not authenticated');
-
-      final response = await http.get(
-        Uri.parse('$baseUrl/cart'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Failed to load cart');
-      }
-    } catch (e) {
-      print('Error loading cart: $e');
-      throw Exception('Cart view error: $e');
-    }
-  }
-
   // Fetch T-shirts API (requires authentication)
   Future<List<Product>> fetchTshirts() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -192,34 +166,97 @@ class ApiService {
     }
   }
 
-  // Add to Cart API
-  Future<void> addToCart(int tshirtId, int quantity, Function onSuccess) async {
-    try {
-      final token = await getToken();
+  // Add T-shirt to cart
+  Future<void> addToCart(int tshirtId, int quantity) async {
+    final token = await getToken();
+    if (token == null) throw Exception('User not authenticated');
 
-      if (token == null) throw Exception('User is not authenticated');
+    final response = await http.post(
+      Uri.parse('$baseUrl/cart/add/$tshirtId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'quantity': quantity}),
+    );
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/cart'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode({
-          'tshirt_id': tshirtId,
-          'quantity': quantity,
-        }),
-      );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add to cart');
+    }
+  }
 
-      if (response.statusCode == 200) {
-        onSuccess();
-      } else {
-        final errorResponse = json.decode(response.body);
-        throw Exception('Failed to add to cart: ${errorResponse['message']}');
-      }
-    } catch (e) {
-      print('Error adding to cart: $e');
-      throw Exception('Add to cart error: $e');
+  // View Cart
+  Future<List<dynamic>> viewCart() async {
+    final token = await getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/cart'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load cart');
+    }
+  }
+
+  // Remove an item from the cart
+  Future<void> removeFromCart(int cartItemId) async {
+    final token = await getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/cart/item/$cartItemId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to remove item from cart');
+    }
+  }
+
+  // Update cart item quantity
+  Future<void> updateCartItem(int cartItemId, int quantity) async {
+    final token = await getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/cart/item/$cartItemId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'quantity': quantity}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update cart item');
+    }
+  }
+
+  // Clear the cart
+  Future<void> clearCart() async {
+    final token = await getToken();
+    if (token == null) throw Exception('User not authenticated');
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/cart/clear'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to clear cart');
     }
   }
 }
