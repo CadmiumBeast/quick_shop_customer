@@ -1,10 +1,10 @@
 class CartItem {
-  final String id; // Unique identifier for the cart item
-  final String name; // Product name
-  final String color; // Product color
-  final String size; // Product size
-  final double price; // Product price
-  int quantity; // Quantity of the product
+  final String id; 
+  final String name; 
+  final String color; 
+  final String size; 
+  final double price; 
+  int quantity;
 
   CartItem({
     required this.id,
@@ -15,7 +15,6 @@ class CartItem {
     this.quantity = 1,
   });
 
-  // Factory method to create a CartItem from JSON
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       id: json['id'].toString(),

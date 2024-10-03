@@ -205,8 +205,8 @@ class ApiService {
     );
 
     // Log the full response body to console
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    //print('Response status: ${response.statusCode}');
+    //print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body); // Decode the JSON response
@@ -230,6 +230,8 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
     );
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to remove item from cart');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/Product.dart'; // Import your Product model
 import '../services/api_service.dart';
+import 'update_cart_screen.dart'; // Import the UpdateCartScreen
 
 class CartScreen extends StatefulWidget {
   @override
@@ -34,6 +35,7 @@ class _CartScreenState extends State<CartScreen> {
             price: double.parse(tshirt['price']),
             stock: tshirt['stock'],
             quantity: item['quantity'],
+            cartItemId: item['id'], // Assuming your API returns the cart item ID
           );
         }).toList();
         _isLoading = false; // Stop loading after fetching items
@@ -44,6 +46,18 @@ class _CartScreenState extends State<CartScreen> {
         _errorMessage = e.toString(); // Set the error message
       });
     }
+  }
+
+  void _navigateToUpdateCart(Product product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdateCartScreen(product: product), // Pass the product to UpdateCartScreen
+      ),
+    ).then((value) {
+      // Refresh the cart items after returning from UpdateCartScreen
+      _fetchCartItems();
+    });
   }
 
   @override
@@ -60,8 +74,7 @@ class _CartScreenState extends State<CartScreen> {
                   child: Text('Error: $_errorMessage')) // Show error message
               : _cartItems.isEmpty
                   ? Center(
-                      child:
-                          Text('Your cart is empty!')) // No items in the cart
+                      child: Text('Your cart is empty!')) // No items in the cart
                   : ListView.builder(
                       itemCount: _cartItems.length,
                       itemBuilder: (context, index) {
@@ -101,6 +114,22 @@ class _CartScreenState extends State<CartScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                   ),
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () => _navigateToUpdateCart(product), // Navigate to update screen
+                                      child: Text('Update'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Here you can implement the delete functionality if required
+                                      },
+                                      child: Text('Delete'),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
