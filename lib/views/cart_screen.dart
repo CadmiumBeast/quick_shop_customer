@@ -80,28 +80,23 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
-  // Method to handle purchase via API service after Stripe payment
   void _purchaseItems() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Process payment through Stripe and capture the result
       bool paymentSuccess = await StripeService.instance.makePayment();
 
-      // Proceed with the purchase only if the payment was successful
       if (paymentSuccess) {
-        // Call API to complete purchase and clear the cart
         await _apiService.purchaseCart();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Purchase successful!')),
         );
 
-        _fetchCartItems(); // Refresh the cart after purchase
+        _fetchCartItems();
       } else {
-        // Payment failed or was canceled
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Payment failed or canceled')),
         );
@@ -134,7 +129,6 @@ class _CartScreenState extends State<CartScreen> {
                   ? Center(child: Text('Your cart is empty!'))
                   : LayoutBuilder(
                       builder: (context, constraints) {
-                        // Check if the screen is wide (landscape) or narrow (portrait)
                         bool isWideScreen = constraints.maxWidth > 600;
 
                         return Column(
@@ -143,12 +137,10 @@ class _CartScreenState extends State<CartScreen> {
                               child: GridView.builder(
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: isWideScreen
-                                      ? 2
-                                      : 1, // 2 columns for wide screens
+                                  crossAxisCount: isWideScreen ? 2 : 1,
                                   crossAxisSpacing: 10,
                                   mainAxisSpacing: 10,
-                                  childAspectRatio: 1.8,
+                                  childAspectRatio: 1.5,
                                 ),
                                 itemCount: _cartItems.length,
                                 itemBuilder: (context, index) {
@@ -156,15 +148,16 @@ class _CartScreenState extends State<CartScreen> {
                                   return Card(
                                     margin: EdgeInsets.all(10),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
+                                      padding: const EdgeInsets.all(16.0),
                                       child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // Display the product image
                                           Container(
-                                            width: 100,
-                                            height: 100,
+                                            width: 250,
+                                            height: 250,
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
@@ -176,9 +169,8 @@ class _CartScreenState extends State<CartScreen> {
                                               errorBuilder:
                                                   (context, error, stackTrace) {
                                                 return Icon(Icons.image,
-                                                    size: 50,
-                                                    color: Colors
-                                                        .grey); // Fallback image
+                                                    size: 60,
+                                                    color: Colors.grey);
                                               },
                                             ),
                                           ),
@@ -186,53 +178,89 @@ class _CartScreenState extends State<CartScreen> {
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.center,
                                               children: [
                                                 Text(
                                                   product.name,
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: 20,
                                                     fontWeight: FontWeight.bold,
                                                   ),
+                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
                                                   'Color: ${product.color}',
                                                   style:
-                                                      TextStyle(fontSize: 16),
+                                                      TextStyle(fontSize: 18),
+                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
                                                   'Price: \$${product.price.toStringAsFixed(2)}',
                                                   style: TextStyle(
-                                                    fontSize: 16,
+                                                    fontSize: 18,
                                                     fontWeight: FontWeight.bold,
                                                   ),
+                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
                                                   'Quantity: ${product.quantity}',
                                                   style:
-                                                      TextStyle(fontSize: 16),
+                                                      TextStyle(fontSize: 18),
+                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 10),
                                                 Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                      MainAxisAlignment.center,
                                                   children: [
-                                                    ElevatedButton(
+                                                    ElevatedButton.icon(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        shadowColor:
+                                                            Colors.transparent,
+                                                      ),
                                                       onPressed: () =>
                                                           _navigateToUpdateCart(
                                                               product),
-                                                      child: Text('Update'),
+                                                      icon: Icon(
+                                                        Icons.edit,
+                                                        color: Colors.blue,
+                                                      ),
+                                                      label: Text(
+                                                        'Update',
+                                                        style: TextStyle(
+                                                          color: Colors.blue,
+                                                        ),
+                                                      ),
                                                     ),
-                                                    ElevatedButton(
+                                                    SizedBox(width: 10),
+                                                    ElevatedButton.icon(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        shadowColor:
+                                                            Colors.transparent,
+                                                      ),
                                                       onPressed: () {
                                                         _removeCartItem(
                                                             product.cartItemId);
                                                       },
-                                                      child: Text('Delete'),
+                                                      icon: Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red,
+                                                      ),
+                                                      label: Text(
+                                                        'Delete',
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -248,11 +276,19 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: ElevatedButton(
-                                onPressed: _cartItems.isEmpty
-                                    ? null
-                                    : _purchaseItems, // Call the payment method
-                                child: Text('Purchase'),
+                              child: Center(
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors
+                                        .green, // Change to your desired color
+                                  ),
+                                  onPressed: _cartItems.isEmpty
+                                      ? null
+                                      : _purchaseItems,
+                                  icon: Icon(
+                                      Icons.shopping_cart), // Add icon here
+                                  label: Text('Purchase'),
+                                ),
                               ),
                             ),
                           ],

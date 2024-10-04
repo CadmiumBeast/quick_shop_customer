@@ -1,3 +1,4 @@
+// Import required packages
 import 'package:flutter/material.dart';
 import '../models/Product.dart';
 import '../services/api_service.dart';
@@ -156,9 +157,15 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
                           child:
                               CircularProgressIndicator(), // Show loader when API is being called
                         )
-                      : ElevatedButton(
+                      : ElevatedButton.icon(
                           onPressed: _addToCart,
-                          child: Text('Add to Cart'),
+                          icon: Icon(Icons
+                              .add_shopping_cart), // Add shopping cart icon
+                          label: Text('Add to Cart'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.green, // Change the button color
+                          ),
                         ),
                 ],
               ),
