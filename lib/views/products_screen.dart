@@ -44,9 +44,10 @@ class _ProductsScreenState extends State<HomeScreen> {
 
             return Column(
               children: [
-                // Search Bar
+                // Search Bar with Top Padding
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(
+                      26.0, 44.0, 26.0, 16.0), // Add padding to top and sides
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -82,10 +83,13 @@ class _ProductsScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Carousel Slider
+                // Add Spacing between Search Bar and Carousel Slider
+                SizedBox(height: 16.0), // Space between search bar and carousel
+
+                // Narrower Carousel Slider
                 CarouselSlider(
                   options: CarouselOptions(
-                    height: 200.0,
+                    height: 250.0, // Reduced height to make it narrower
                     autoPlay: true,
                     aspectRatio: 16 / 9,
                     viewportFraction: 1.0,
@@ -108,10 +112,10 @@ class _ProductsScreenState extends State<HomeScreen> {
                               Image.network(
                                 product.image,
                                 fit: BoxFit.cover,
-                                height: 120.0, // Adjust height as needed
+                                height: 100.0, // Adjust height as needed
                                 errorBuilder: (context, error, stackTrace) {
                                   return Icon(Icons.image,
-                                      size: 120,
+                                      size: 100,
                                       color: Colors
                                           .grey); // Fallback if image fails to load
                                 },
@@ -122,7 +126,7 @@ class _ProductsScreenState extends State<HomeScreen> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.deepPurple,
+                                  color: const Color.fromARGB(255, 0, 0, 0),
                                 ),
                               ),
                             ],
@@ -131,6 +135,23 @@ class _ProductsScreenState extends State<HomeScreen> {
                       },
                     );
                   }).toList(),
+                ),
+
+                // Add Spacing between Carousel Slider and Product Grid
+                SizedBox(
+                    height: 16.0), // Space between carousel and product grid
+
+                // Heading Text for the Product Grid
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    'Products', // Add your heading here
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
 
                 // Product Grid

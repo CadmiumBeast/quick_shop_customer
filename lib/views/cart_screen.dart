@@ -82,14 +82,16 @@ class _CartScreenState extends State<CartScreen> {
 
   // Method to handle purchase via API service after Stripe payment
   void _purchaseItems() async {
-    setState(() {
-      _isLoading = true;
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    try {
-      // Process payment through Stripe
-      await StripeService.instance.makePayment();
+  try {
+    // Process payment through Stripe and capture the result
+    bool paymentSuccess = await StripeService.instance.makePayment();
 
+    // Proceed with the purchase only if the payment was successful
+    if (paymentSuccess) {
       // Call API to complete purchase and clear the cart
       await _apiService.purchaseCart();
 
@@ -98,19 +100,26 @@ class _CartScreenState extends State<CartScreen> {
       );
 
       _fetchCartItems(); // Refresh the cart after purchase
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+    } else {
+      // Payment failed or was canceled
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Purchase failed: $_errorMessage')),
+        SnackBar(content: Text('Payment failed or canceled')),
       );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
+  } catch (e) {
+    setState(() {
+      _errorMessage = e.toString();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Purchase failed: $_errorMessage')),
+    );
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

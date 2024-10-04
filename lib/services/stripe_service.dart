@@ -8,7 +8,7 @@ class StripeService {
   static final StripeService instance = StripeService._();
 
   // Method to initiate payment
-  Future<void> makePayment() async {
+  Future<bool> makePayment() async {
     try {
       // Step 1: Create a payment intent on Stripe
       String? paymentIntentClientSecret =
@@ -16,7 +16,7 @@ class StripeService {
 
       if (paymentIntentClientSecret == null) {
         print('Failed to create payment intent');
-        return;
+        return false; // Return false if payment intent creation fails
       }
 
       // Step 2: Initialize the payment sheet
@@ -24,14 +24,14 @@ class StripeService {
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: paymentIntentClientSecret,
           merchantDisplayName: 'Quick Shop',
-          // You can add more configuration like Apple Pay and Google Pay
         ),
       );
 
       // Step 3: Present the payment sheet to the user
-      await _processPayment();
+      return await _processPayment(); // Return the result of the payment process
     } catch (e) {
       print('Payment error: $e');
+      return false; // Return false if an error occurs
     }
   }
 
@@ -69,12 +69,14 @@ class StripeService {
   }
 
   // Method to process the payment after payment sheet is presented
-  Future<void> _processPayment() async {
+  Future<bool> _processPayment() async {
     try {
       await Stripe.instance.presentPaymentSheet();
       print("Payment completed successfully!");
+      return true; // Payment success
     } catch (e) {
       print('Error presenting payment sheet: $e');
+      return false; // Payment failed
     }
   }
 
