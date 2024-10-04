@@ -42,18 +42,30 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the orientation
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add to Cart'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Display the product image
-            Center(
-              child: Container(
+      body: Center(
+        // Center the entire body content
+        child: Padding(
+          padding: isPortrait
+              ? const EdgeInsets.all(16.0) // Padding for portrait mode
+              : const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0), // Closer together in landscape
+          child: Column(
+            mainAxisAlignment:
+                MainAxisAlignment.center, // Center items vertically
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Center items horizontally
+            children: [
+              // Display the product image
+              Container(
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
@@ -72,64 +84,86 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
                   },
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              widget.product.name,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-                'Color: ${widget.product.color} | Size: ${widget.product.size}'),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Price: \$${widget.product.price.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        if (_quantity > 1) {
+              SizedBox(height: 20), // Fixed spacing for both orientations
+
+              // Display product name
+              Text(
+                widget.product.name,
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center, // Center the text
+              ),
+              SizedBox(height: 10), // Fixed spacing for both orientations
+
+              // Display product color and size
+              Text(
+                'Color: ${widget.product.color} | Size: ${widget.product.size}',
+                textAlign: TextAlign.center, // Center the text
+              ),
+              SizedBox(height: 20), // Fixed spacing for both orientations
+
+              // Row for price and quantity selector
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Center the row contents
+                children: [
+                  Text(
+                    'Price: \$${widget.product.price.toStringAsFixed(2)}',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 16), // Space between price and quantity
+                  // Quantity selector
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          if (_quantity > 1) {
+                            setState(() {
+                              _quantity--;
+                            });
+                          }
+                        },
+                      ),
+                      Text(
+                        '$_quantity',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
                           setState(() {
-                            _quantity--;
+                            _quantity++;
                           });
-                        }
-                      },
-                    ),
-                    Text(
-                      '$_quantity',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        setState(() {
-                          _quantity++;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: _isLoading
-                  ? Center(
-                      child:
-                          CircularProgressIndicator()) // Show loader when API is being called
-                  : ElevatedButton(
-                      onPressed: _addToCart,
-                      child: Text('Add to Cart'),
-                    ),
-            ),
-          ],
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Spacer for flexible spacing
+              SizedBox(height: 20), // Fixed space before the button
+
+              // Add to cart button
+              Row(
+                mainAxisSize:
+                    MainAxisSize.min, // Make the row take minimum width
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Center the button in the row
+                children: [
+                  _isLoading
+                      ? Center(
+                          child:
+                              CircularProgressIndicator(), // Show loader when API is being called
+                        )
+                      : ElevatedButton(
+                          onPressed: _addToCart,
+                          child: Text('Add to Cart'),
+                        ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
