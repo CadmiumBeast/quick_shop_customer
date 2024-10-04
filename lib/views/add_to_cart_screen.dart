@@ -51,6 +51,29 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Display the product image
+            Center(
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[200],
+                ),
+                child: Image.network(
+                  widget.product.image,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.image,
+                      size: 100,
+                      color: Colors.grey, // Placeholder icon for error
+                    );
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             Text(
               widget.product.name,
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),

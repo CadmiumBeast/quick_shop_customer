@@ -35,6 +35,8 @@ class _CartScreenState extends State<CartScreen> {
             price: double.parse(tshirt['price']),
             stock: tshirt['stock'],
             quantity: item['quantity'],
+            description: tshirt['description'],
+            image: tshirt['image'],
             cartItemId: item['id'],
           );
         }).toList();
@@ -133,53 +135,85 @@ class _CartScreenState extends State<CartScreen> {
                                 margin: EdgeInsets.all(10),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: Column(
+                                  child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        product.name,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                      // Display the product image
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[200],
+                                        ),
+                                        child: Image.network(
+                                          product.image,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Icon(Icons.image,
+                                                size: 50,
+                                                color: Colors
+                                                    .grey); // Fallback image
+                                          },
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        'Color: ${product.color}',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        'Price: \$${product.price.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                      SizedBox(width: 15),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              product.name,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(
+                                              'Color: ${product.color}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(
+                                              'Price: \$${product.price.toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(
+                                              'Quantity: ${product.quantity}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      _navigateToUpdateCart(
+                                                          product),
+                                                  child: Text('Update'),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    _removeCartItem(
+                                                        product.cartItemId);
+                                                  },
+                                                  child: Text('Delete'),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        'Quantity: ${product.quantity}',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      SizedBox(height: 10),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () =>
-                                                _navigateToUpdateCart(product),
-                                            child: Text('Update'),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              _removeCartItem(
-                                                  product.cartItemId!);
-                                            },
-                                            child: Text('Delete'),
-                                          ),
-                                        ],
                                       ),
                                     ],
                                   ),

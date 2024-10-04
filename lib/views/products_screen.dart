@@ -29,9 +29,6 @@ class _ProductsScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('T-Shirt Listings'),
-      ),
       body: FutureBuilder<List<Product>>(
         future: _tshirtFuture,
         builder: (context, snapshot) {
@@ -50,23 +47,38 @@ class _ProductsScreenState extends State<HomeScreen> {
                 // Search Bar
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    onChanged: (value) {
-                      // Update filtered products based on search input
-                      setState(() {
-                        _filteredProducts = products
-                            .where((product) => product.name
-                                .toLowerCase()
-                                .contains(value.toLowerCase()))
-                            .toList();
-                      });
-                    },
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        prefixIcon: Icon(Icons.search,
+                            color: const Color.fromARGB(255, 26, 0, 71)),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(15.0),
+                      ),
+                      onChanged: (value) {
+                        // Update filtered products based on search input
+                        setState(() {
+                          _filteredProducts = products
+                              .where((product) => product.name
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                    ),
                   ),
                 ),
 
@@ -85,13 +97,35 @@ class _ProductsScreenState extends State<HomeScreen> {
                           width: MediaQuery.of(context).size.width,
                           margin: EdgeInsets.symmetric(horizontal: 5.0),
                           decoration: BoxDecoration(
-                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(15.0),
+                            color: Colors
+                                .grey[300], // Placeholder background color
                           ),
-                          child: Center(
-                            child: Text(
-                              product.name,
-                              style: TextStyle(fontSize: 16.0),
-                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Display image from the product
+                              Image.network(
+                                product.image,
+                                fit: BoxFit.cover,
+                                height: 120.0, // Adjust height as needed
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(Icons.image,
+                                      size: 120,
+                                      color: Colors
+                                          .grey); // Fallback if image fails to load
+                                },
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                product.name,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       },
@@ -102,11 +136,12 @@ class _ProductsScreenState extends State<HomeScreen> {
                 // Product Grid
                 Expanded(
                   child: GridView.builder(
+                    padding: const EdgeInsets.all(10),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 1.5,
+                      childAspectRatio: 0.7,
                     ),
                     itemCount: _filteredProducts.length,
                     itemBuilder: (context, index) {
@@ -125,30 +160,56 @@ class _ProductsScreenState extends State<HomeScreen> {
                           );
                         },
                         child: Card(
-                          margin: EdgeInsets.all(10),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Image section
+                                Expanded(
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Colors.grey[300],
+                                    ),
+                                    child: Image.network(
+                                      product.image,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Icon(Icons.image,
+                                            size: 120,
+                                            color:
+                                                Colors.grey); // Fallback image
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
                                 Text(
                                   product.name,
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 5),
+                                SizedBox(height: 4),
                                 Text(
                                   'Color: ${product.color} | Size: ${product.size}',
-                                  style: TextStyle(fontSize: 16),
+                                  style: TextStyle(fontSize: 14),
                                 ),
-                                Spacer(),
+                                SizedBox(height: 4),
                                 Text(
                                   '\$${product.price.toStringAsFixed(2)}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
+                                    color: const Color.fromARGB(255, 0, 0, 0),
                                   ),
                                 ),
                               ],

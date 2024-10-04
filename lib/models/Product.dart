@@ -6,7 +6,9 @@ class Product {
   final double price;
   final int stock;
   final int quantity;
-  final int cartItemId; // New field to store the cart item ID
+  final String description; // Changed to String for text description
+  final String image; // Changed to String to store the image URL
+  final int cartItemId; // Field to store the cart item ID
 
   Product({
     required this.id,
@@ -16,7 +18,9 @@ class Product {
     required this.price,
     required this.stock,
     required this.quantity,
-    required this.cartItemId, // Ensure cartItemId is required
+    required this.description,
+    required this.image,
+    required this.cartItemId,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -29,8 +33,11 @@ class Product {
           0.0, // Default to 0.0 if parsing fails
       stock: json['stock'] ?? 0, // Default stock to 0
       quantity: json['quantity'] ?? 1, // Default quantity to 1
-      cartItemId:
-          json['cart_item_id'] ?? 0, // Assuming your API returns cart item ID
+      description:
+          json['description'] ?? 'No description', // Default description text
+      image: json['image'] ??
+          'https://example.com/default_image.png', // Default image URL
+      cartItemId: json['cart_item_id'] ?? 0, // Default cart item ID to 0
     );
   }
 }
