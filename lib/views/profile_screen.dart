@@ -57,6 +57,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode =
+        Theme.of(context).brightness == Brightness.dark; // Check for dark mode
+
     return Scaffold(
       appBar: AppBar(title: Text('Profile')),
       body: Padding(
@@ -84,6 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
             // Bio
             Card(
               margin: const EdgeInsets.symmetric(vertical: 10),
+              color: Theme.of(context).cardColor, // Use theme color
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -145,14 +149,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Button to navigate to the Update Profile screen
             Container(
-              padding:
-                  EdgeInsets.only(left: 16.0), // Move the button to the right
+              padding: EdgeInsets.only(left: 16.0),
               child: ListTile(
                 leading: Icon(Icons.edit),
                 title: Text('Update Profile'),
                 onTap: _navigateToUpdateProfile,
-                tileColor:
-                    Colors.white12, // Light background color for the button
+                tileColor: isDarkMode
+                    ? Colors.black
+                    : Colors.white, // Button background color
+                textColor: isDarkMode
+                    ? Colors.white
+                    : Colors.black, // Button text color
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -165,14 +172,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Logout button
             Container(
-              padding:
-                  EdgeInsets.only(left: 16.0), // Move the button to the right
+              padding: EdgeInsets.only(left: 16.0),
               child: ListTile(
                 leading: Icon(Icons.logout),
                 title: Text('Logout'),
                 onTap: _logout,
-                tileColor:
-                    Colors.white12, // Light background color for the button
+                tileColor: isDarkMode
+                    ? Colors.black
+                    : Colors.white, // Button background color
+                textColor: isDarkMode
+                    ? Colors.white
+                    : Colors.black, // Button text color
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),

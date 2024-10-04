@@ -22,8 +22,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Quick shop',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'Quick Shop',
+      theme: ThemeData.light().copyWith(
+        primaryColor: const Color.fromARGB(255, 2, 22, 39),
+        scaffoldBackgroundColor: Colors.white,
+        textTheme: ThemeData.light().textTheme,
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        primaryColor: Colors.grey[800],
+        scaffoldBackgroundColor: Colors.black,
+        textTheme: ThemeData.dark().textTheme.apply(
+              bodyColor: Colors.white,
+            ),
+      ),
+      themeMode: ThemeMode
+          .system, // Use system theme mode (light or dark based on system settings)
       home: FutureBuilder<String?>(
         future: _apiService.getToken(),
         builder: (context, snapshot) {

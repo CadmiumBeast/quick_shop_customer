@@ -131,10 +131,12 @@ class _CartScreenState extends State<CartScreen> {
                       builder: (context, constraints) {
                         bool isWideScreen = constraints.maxWidth > 600;
 
-                        return Column(
-                          children: [
-                            Expanded(
-                              child: GridView.builder(
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              GridView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: isWideScreen ? 2 : 1,
@@ -150,18 +152,19 @@ class _CartScreenState extends State<CartScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Container(
-                                            width: 250,
-                                            height: 250,
+                                            width:
+                                                100, // Adjust width as needed
+                                            height:
+                                                100, // Adjust height as needed
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
-                                              color: Colors.grey[200],
+                                              color:
+                                                  Theme.of(context).cardColor,
                                             ),
                                             child: Image.network(
                                               product.image,
@@ -178,7 +181,7 @@ class _CartScreenState extends State<CartScreen> {
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   product.name,
@@ -186,14 +189,13 @@ class _CartScreenState extends State<CartScreen> {
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
                                                   ),
-                                                  textAlign: TextAlign.center,
+                                                  textAlign: TextAlign.start,
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
                                                   'Color: ${product.color}',
                                                   style:
                                                       TextStyle(fontSize: 18),
-                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
@@ -202,25 +204,23 @@ class _CartScreenState extends State<CartScreen> {
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
                                                   ),
-                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
                                                   'Quantity: ${product.quantity}',
                                                   style:
                                                       TextStyle(fontSize: 18),
-                                                  textAlign: TextAlign.center,
                                                 ),
                                                 SizedBox(height: 10),
                                                 Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.center,
+                                                      MainAxisAlignment.start,
                                                   children: [
                                                     ElevatedButton.icon(
                                                       style: ElevatedButton
                                                           .styleFrom(
                                                         backgroundColor:
-                                                            Colors.transparent,
+                                                            Colors.blueAccent,
                                                         shadowColor:
                                                             Colors.transparent,
                                                       ),
@@ -229,12 +229,12 @@ class _CartScreenState extends State<CartScreen> {
                                                               product),
                                                       icon: Icon(
                                                         Icons.edit,
-                                                        color: Colors.blue,
+                                                        color: Colors.white,
                                                       ),
                                                       label: Text(
                                                         'Update',
                                                         style: TextStyle(
-                                                          color: Colors.blue,
+                                                          color: Colors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -243,7 +243,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       style: ElevatedButton
                                                           .styleFrom(
                                                         backgroundColor:
-                                                            Colors.transparent,
+                                                            Colors.redAccent,
                                                         shadowColor:
                                                             Colors.transparent,
                                                       ),
@@ -253,12 +253,12 @@ class _CartScreenState extends State<CartScreen> {
                                                       },
                                                       icon: Icon(
                                                         Icons.delete,
-                                                        color: Colors.red,
+                                                        color: Colors.white,
                                                       ),
                                                       label: Text(
                                                         'Delete',
                                                         style: TextStyle(
-                                                          color: Colors.red,
+                                                          color: Colors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -273,25 +273,34 @@ class _CartScreenState extends State<CartScreen> {
                                   );
                                 },
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Center(
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors
-                                        .green, // Change to your desired color
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Center(
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                    ),
+                                    onPressed: _cartItems.isEmpty
+                                        ? null
+                                        : _purchaseItems,
+                                    icon: Icon(Icons.shopping_cart,
+                                        color: Colors.white),
+                                    label: Text(
+                                      'Purchase',
+                                      style: TextStyle(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors
+                                                .white // White text for dark mode
+                                            : Colors
+                                                .black, // Black text for light mode
+                                      ),
+                                    ),
                                   ),
-                                  onPressed: _cartItems.isEmpty
-                                      ? null
-                                      : _purchaseItems,
-                                  icon: Icon(
-                                      Icons.shopping_cart), // Add icon here
-                                  label: Text('Purchase'),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         );
                       },
                     ),

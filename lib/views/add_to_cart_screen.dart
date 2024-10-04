@@ -17,8 +17,21 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
   final ApiService _apiService = ApiService();
   int _quantity = 1; // Default quantity
   bool _isLoading = false; // Loading state for API call
+  int _maxQuantity = 10; // Assume maximum quantity limit for this example
 
+  // Method to add product to cart
   void _addToCart() async {
+    if (_quantity > _maxQuantity) {
+      // Show error if the quantity exceeds the stock limit
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Quantity exceeds available stock!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true; // Show loader during the API call
     });
@@ -27,12 +40,18 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
       // Call the API service to add the product to the cart
       await _apiService.addToCart(widget.product.id, _quantity);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Added to cart successfully!')),
+        SnackBar(
+          content: Text('Added to cart successfully!'),
+          backgroundColor: Colors.green, // Success color
+        ),
       );
       Navigator.pop(context); // Navigate back after adding to cart
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add to cart: $e')),
+        SnackBar(
+          content: Text('Failed to add to cart: $e'),
+          backgroundColor: Colors.red, // Failure color
+        ),
       );
     } finally {
       setState(() {
@@ -43,7 +62,7 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the orientation
+    final theme = Theme.of(context); // Access current theme (light or dark)
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
@@ -52,20 +71,17 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
         title: Text('Add to Cart'),
       ),
       body: Center(
-        // Center the entire body content
         child: Padding(
           padding: isPortrait
               ? const EdgeInsets.all(16.0) // Padding for portrait mode
               : const EdgeInsets.symmetric(
                   horizontal: 16.0,
-                  vertical: 8.0), // Closer together in landscape
+                  vertical: 8.0), // Closer together in landscape mode
           child: Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center, // Center items vertically
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // Center items horizontally
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Display the product image
+              // Product Image
               Container(
                 width: 200,
                 height: 200,
@@ -85,34 +101,45 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
                   },
                 ),
               ),
-              SizedBox(height: 20), // Fixed spacing for both orientations
+              SizedBox(height: 20),
 
-              // Display product name
+              // Product Name
               Text(
                 widget.product.name,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center, // Center the text
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color, // Adapt to theme
+                ),
+                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10), // Fixed spacing for both orientations
+              SizedBox(height: 10),
 
-              // Display product color and size
+              // Product Color and Size
               Text(
                 'Color: ${widget.product.color} | Size: ${widget.product.size}',
-                textAlign: TextAlign.center, // Center the text
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color, // Adapt to theme
+                ),
               ),
-              SizedBox(height: 20), // Fixed spacing for both orientations
+              SizedBox(height: 20),
 
-              // Row for price and quantity selector
+              // Price and Quantity Selector
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Center the row contents
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Price: \$${widget.product.price.toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.bodyLarge?.color, // Adapt to theme
+                    ),
                   ),
-                  SizedBox(width: 16), // Space between price and quantity
-                  // Quantity selector
+                  SizedBox(width: 16),
+
+                  // Quantity Selector
                   Row(
                     children: [
                       IconButton(
@@ -127,44 +154,45 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
                       ),
                       Text(
                         '$_quantity',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: theme
+                              .textTheme.bodyLarge?.color, // Adapt to theme
+                        ),
                       ),
                       IconButton(
                         icon: Icon(Icons.add),
                         onPressed: () {
-                          setState(() {
-                            _quantity++;
-                          });
+                          if (_quantity < _maxQuantity) {
+                            setState(() {
+                              _quantity++;
+                            });
+                          }
                         },
                       ),
                     ],
                   ),
                 ],
               ),
+              SizedBox(height: 20),
 
-              // Spacer for flexible spacing
-              SizedBox(height: 20), // Fixed space before the button
-
-              // Add to cart button
+              // Add to Cart Button
               Row(
-                mainAxisSize:
-                    MainAxisSize.min, // Make the row take minimum width
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Center the button in the row
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _isLoading
                       ? Center(
                           child:
-                              CircularProgressIndicator(), // Show loader when API is being called
+                              CircularProgressIndicator(), // Show loader during the API call
                         )
                       : ElevatedButton.icon(
                           onPressed: _addToCart,
-                          icon: Icon(Icons
-                              .add_shopping_cart), // Add shopping cart icon
+                          icon: Icon(Icons.add_shopping_cart),
                           label: Text('Add to Cart'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                Colors.green, // Change the button color
+                                Colors.green, // Custom button color
                           ),
                         ),
                 ],

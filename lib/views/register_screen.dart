@@ -40,9 +40,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black, // Black background
+    final theme = Theme.of(context); // Get the current theme
+    final isDarkMode = theme.brightness == Brightness.dark;
 
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor, // Adapt background color
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -62,62 +64,90 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Name',
-                labelStyle: TextStyle(color: Colors.white), // White label text
+                labelStyle: TextStyle(
+                    color: theme
+                        .textTheme.bodyLarge?.color), // Adapt label text color
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White border
+                  borderSide: BorderSide(
+                      color: theme.textTheme.bodyLarge?.color ??
+                          Colors.grey), // Adapt border color
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue), // Focused border
+                  borderSide: BorderSide(
+                      color: theme
+                          .primaryColor), // Primary color for focused border
                 ),
               ),
-              style: TextStyle(color: Colors.white), // White text
+              style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color), // Adapt text color
             ),
             SizedBox(height: 20),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.white), // White label text
+                labelStyle: TextStyle(
+                    color: theme
+                        .textTheme.bodyLarge?.color), // Adapt label text color
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White border
+                  borderSide: BorderSide(
+                      color: theme.textTheme.bodyLarge?.color ??
+                          Colors.grey), // Adapt border color
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue), // Focused border
+                  borderSide: BorderSide(
+                      color: theme
+                          .primaryColor), // Primary color for focused border
                 ),
               ),
-              style: TextStyle(color: Colors.white), // White text
+              style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color), // Adapt text color
             ),
             SizedBox(height: 20),
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.white), // White label text
+                labelStyle: TextStyle(
+                    color: theme
+                        .textTheme.bodyLarge?.color), // Adapt label text color
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White border
+                  borderSide: BorderSide(
+                      color: theme.textTheme.bodyLarge?.color ??
+                          Colors.grey), // Adapt border color
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue), // Focused border
+                  borderSide: BorderSide(
+                      color: theme
+                          .primaryColor), // Primary color for focused border
                 ),
               ),
               obscureText: true,
-              style: TextStyle(color: Colors.white), // White text
+              style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color), // Adapt text color
             ),
             SizedBox(height: 20),
             TextField(
               controller: _passwordConfirmController,
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
-                labelStyle: TextStyle(color: Colors.white), // White label text
+                labelStyle: TextStyle(
+                    color: theme
+                        .textTheme.bodyLarge?.color), // Adapt label text color
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White border
+                  borderSide: BorderSide(
+                      color: theme.textTheme.bodyLarge?.color ??
+                          Colors.grey), // Adapt border color
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue), // Focused border
+                  borderSide: BorderSide(
+                      color: theme
+                          .primaryColor), // Primary color for focused border
                 ),
               ),
               obscureText: true,
-              style: TextStyle(color: Colors.white), // White text
+              style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color), // Adapt text color
             ),
             SizedBox(height: 20),
             if (_errorMessage != null)
@@ -129,14 +159,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ElevatedButton(
               onPressed: _register,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white, // White background
+                backgroundColor: theme
+                    .primaryColor, // Use primary color for button background
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25), // Rounded corners
                 ),
               ),
               child: Text(
                 'Register',
-                style: TextStyle(color: Colors.black), // Black text
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.black
+                        : Colors.white), // Adapt button text color
               ),
             ),
             TextButton(
@@ -148,7 +182,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               child: Text(
                 'Already have an account? Login',
-                style: TextStyle(color: Colors.white), // White text
+                style: TextStyle(
+                    color:
+                        theme.textTheme.bodyLarge?.color), // Adapt text color
               ),
             ),
           ],

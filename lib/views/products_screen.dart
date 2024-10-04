@@ -27,6 +27,9 @@ class _ProductsScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: FutureBuilder<List<Product>>(
         future: _tshirtFuture,
@@ -44,8 +47,8 @@ class _ProductsScreenState extends State<HomeScreen> {
             return OrientationBuilder(
               builder: (context, orientation) {
                 return orientation == Orientation.portrait
-                    ? _buildPortraitLayout(products)
-                    : _buildLandscapeLayout(products);
+                    ? _buildPortraitLayout(products, isDarkMode)
+                    : _buildLandscapeLayout(products, isDarkMode);
               },
             );
           }
@@ -55,7 +58,8 @@ class _ProductsScreenState extends State<HomeScreen> {
   }
 
   // Portrait Layout
-  Widget _buildPortraitLayout(List<Product> products) {
+  Widget _buildPortraitLayout(List<Product> products, bool isDarkMode) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Padding(
@@ -70,29 +74,33 @@ class _ProductsScreenState extends State<HomeScreen> {
             aspectRatio: 16 / 9,
             viewportFraction: 1.0,
           ),
-          items: _buildCarouselItems(products),
+          items: _buildCarouselItems(products, isDarkMode),
         ),
         SizedBox(height: 16.0),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
             'Products',
-            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.w500,
+              color: theme.textTheme.bodyLarge?.color,
+            ),
           ),
         ),
         Expanded(
-          child: _buildProductGrid(),
+          child: _buildProductGrid(isDarkMode),
         ),
       ],
     );
   }
 
   // Landscape Layout
-  Widget _buildLandscapeLayout(List<Product> products) {
+  Widget _buildLandscapeLayout(List<Product> products, bool isDarkMode) {
     return Row(
       children: [
         Expanded(
-          flex: 1, // Occupies the left side (Search and Carousel)
+          flex: 1,
           child: Column(
             children: [
               Padding(
@@ -107,14 +115,14 @@ class _ProductsScreenState extends State<HomeScreen> {
                   aspectRatio: 16 / 9,
                   viewportFraction: 1.0,
                 ),
-                items: _buildCarouselItems(products),
+                items: _buildCarouselItems(products, isDarkMode),
               ),
             ],
           ),
         ),
         Expanded(
-          flex: 2, // Occupies the right side (Product Grid)
-          child: _buildProductGrid(),
+          flex: 2,
+          child: _buildProductGrid(isDarkMode),
         ),
       ],
     );
@@ -124,7 +132,7 @@ class _ProductsScreenState extends State<HomeScreen> {
   Widget _buildSearchBar(List<Product> products) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(25.0),
         boxShadow: [
           BoxShadow(
@@ -138,8 +146,8 @@ class _ProductsScreenState extends State<HomeScreen> {
         controller: _searchController,
         decoration: InputDecoration(
           hintText: 'Search...',
-          prefixIcon:
-              Icon(Icons.search, color: const Color.fromARGB(255, 26, 0, 71)),
+          hintStyle: TextStyle(color: Theme.of(context).hintColor),
+          prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColor),
           border: InputBorder.none,
           contentPadding: EdgeInsets.all(15.0),
         ),
@@ -156,7 +164,8 @@ class _ProductsScreenState extends State<HomeScreen> {
   }
 
   // Build Carousel Items
-  List<Widget> _buildCarouselItems(List<Product> products) {
+  List<Widget> _buildCarouselItems(List<Product> products, bool isDarkMode) {
+    final theme = Theme.of(context);
     return products.map((product) {
       return Builder(
         builder: (BuildContext context) {
@@ -165,7 +174,7 @@ class _ProductsScreenState extends State<HomeScreen> {
             margin: EdgeInsets.symmetric(horizontal: 5.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
-              color: Colors.grey[300],
+              color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -181,7 +190,11 @@ class _ProductsScreenState extends State<HomeScreen> {
                 SizedBox(height: 10),
                 Text(
                   product.name,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ),
                 ),
               ],
             ),
@@ -192,7 +205,8 @@ class _ProductsScreenState extends State<HomeScreen> {
   }
 
   // Build Product Grid
-  Widget _buildProductGrid() {
+  Widget _buildProductGrid(bool isDarkMode) {
+    final theme = Theme.of(context);
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -219,6 +233,7 @@ class _ProductsScreenState extends State<HomeScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
+            color: theme.cardColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -229,7 +244,7 @@ class _ProductsScreenState extends State<HomeScreen> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: Colors.grey[300],
+                        color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
                       ),
                       child: Image.network(
                         product.image,
@@ -244,17 +259,28 @@ class _ProductsScreenState extends State<HomeScreen> {
                   SizedBox(height: 8),
                   Text(
                     product.name,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
                   ),
                   SizedBox(height: 4),
                   Text(
                     'Color: ${product.color} | Size: ${product.size}',
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
                   ),
                   SizedBox(height: 4),
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
                   ),
                 ],
               ),

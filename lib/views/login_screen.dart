@@ -27,8 +27,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get the current theme
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.black, // Black background for the theme
+      backgroundColor: theme.scaffoldBackgroundColor, // Adapt background color
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -48,44 +51,62 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.white), // White label text
+                labelStyle: TextStyle(
+                    color: theme
+                        .textTheme.bodyLarge?.color), // Adapt label text color
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White border
+                  borderSide: BorderSide(
+                      color: theme.textTheme.bodyLarge?.color ??
+                          Colors.grey), // Adapt border color
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue), // Focused border
+                  borderSide: BorderSide(
+                      color: theme
+                          .primaryColor), // Primary color for focused border
                 ),
               ),
-              style: TextStyle(color: Colors.white), // White text
+              style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color), // Adapt text color
             ),
             SizedBox(height: 20),
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.white), // White label text
+                labelStyle: TextStyle(
+                    color: theme
+                        .textTheme.bodyLarge?.color), // Adapt label text color
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White border
+                  borderSide: BorderSide(
+                      color: theme.textTheme.bodyLarge?.color ??
+                          Colors.grey), // Adapt border color
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue), // Focused border
+                  borderSide: BorderSide(
+                      color: theme
+                          .primaryColor), // Primary color for focused border
                 ),
               ),
               obscureText: true,
-              style: TextStyle(color: Colors.white), // White text
+              style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color), // Adapt text color
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _login,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white, // White background
+                backgroundColor: theme
+                    .primaryColor, // Use primary color for button background
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25), // Rounded corners
                 ),
               ),
               child: Text(
                 'Login',
-                style: TextStyle(color: Colors.black), // Black text
+                style: TextStyle(
+                    color: isDarkMode
+                        ? Colors.black
+                        : Colors.white), // Adapt button text color
               ),
             ),
             TextButton(
@@ -97,7 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               child: Text(
                 'Don\'t have an account? Register',
-                style: TextStyle(color: Colors.white), // White text
+                style: TextStyle(
+                    color:
+                        theme.textTheme.bodyLarge?.color), // Adapt text color
               ),
             ),
           ],
