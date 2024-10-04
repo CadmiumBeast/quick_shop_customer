@@ -110,7 +110,7 @@ class _ProductsScreenState extends State<HomeScreen> {
               SizedBox(height: 16.0),
               CarouselSlider(
                 options: CarouselOptions(
-                  height: 200.0,
+                  height: 150.0, // Set a shorter height for landscape mode
                   autoPlay: true,
                   aspectRatio: 16 / 9,
                   viewportFraction: 1.0,

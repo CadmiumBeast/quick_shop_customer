@@ -29,6 +29,8 @@ class _HomeScreenState extends State<nav> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -51,8 +53,11 @@ class _HomeScreenState extends State<nav> {
           ),
         ],
         currentIndex: _selectedIndex,
-        unselectedItemColor: const Color.fromARGB(255, 37, 37, 37),
-        selectedItemColor: Colors.blue,
+        unselectedItemColor: isDarkMode
+            ? Colors.white
+            : Colors.black, // Change unselected item color
+        selectedItemColor:
+            Colors.blue, // You can also make this color dynamic if needed
         onTap: _onItemTapped,
       ),
     );

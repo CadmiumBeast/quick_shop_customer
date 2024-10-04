@@ -70,33 +70,37 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
               'Color: ${widget.product.color}',
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 20),
-            // Using a Stepper for quantity selection
+            SizedBox(height: 5), // Reduced space to bring stepper closer
+            // Using a Row for quantity selection, aligned to the left
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Quantity: $_quantity', style: TextStyle(fontSize: 18)),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        if (_quantity > 1) {
+                Text('Quantity: ', style: TextStyle(fontSize: 18)),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          if (_quantity > 1) {
+                            setState(() {
+                              _quantity--;
+                            });
+                          }
+                        },
+                      ),
+                      Text('$_quantity', style: TextStyle(fontSize: 18)),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
                           setState(() {
-                            _quantity--;
+                            _quantity++;
                           });
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        setState(() {
-                          _quantity++;
-                        });
-                      },
-                    ),
-                  ],
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

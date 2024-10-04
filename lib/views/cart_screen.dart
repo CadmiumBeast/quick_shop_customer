@@ -127,151 +127,181 @@ class _CartScreenState extends State<CartScreen> {
               ? Center(child: Text('Error: $_errorMessage'))
               : _cartItems.isEmpty
                   ? Center(child: Text('Your cart is empty!'))
-                  : LayoutBuilder(
-                      builder: (context, constraints) {
-                        bool isWideScreen = constraints.maxWidth > 600;
+                  : OrientationBuilder(
+                      builder: (context, orientation) {
+                        bool isLandscape = orientation == Orientation.landscape;
 
                         return SingleChildScrollView(
                           child: Column(
                             children: [
-                              GridView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: isWideScreen ? 2 : 1,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  childAspectRatio: 1.5,
-                                ),
-                                itemCount: _cartItems.length,
-                                itemBuilder: (context, index) {
-                                  final product = _cartItems[index];
-                                  return Card(
-                                    margin: EdgeInsets.all(10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width:
-                                                100, // Adjust width as needed
-                                            height:
-                                                100, // Adjust height as needed
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color:
-                                                  Theme.of(context).cardColor,
-                                            ),
-                                            child: Image.network(
-                                              product.image,
-                                              fit: BoxFit.cover,
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return Icon(Icons.image,
-                                                    size: 60,
-                                                    color: Colors.grey);
-                                              },
-                                            ),
-                                          ),
-                                          SizedBox(width: 15),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                              // Increased the height of the cart items section
+                              Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.85,
+                                child: GridView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: isLandscape ? 3 : 1,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    childAspectRatio: isLandscape ? 1.2 : 1.5,
+                                  ),
+                                  itemCount: _cartItems.length,
+                                  itemBuilder: (context, index) {
+                                    final product = _cartItems[index];
+                                    return Card(
+                                      margin: EdgeInsets.all(10),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(isLandscape
+                                            ? 8.0
+                                            : 16.0), // Adjust padding
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
                                               children: [
-                                                Text(
-                                                  product.name,
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
+                                                Container(
+                                                  width: isLandscape
+                                                      ? 80
+                                                      : 100, // Adjust width
+                                                  height: isLandscape
+                                                      ? 100
+                                                      : 120, // Adjust height
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Theme.of(context)
+                                                        .cardColor,
                                                   ),
-                                                  textAlign: TextAlign.start,
-                                                ),
-                                                SizedBox(height: 5),
-                                                Text(
-                                                  'Color: ${product.color}',
-                                                  style:
-                                                      TextStyle(fontSize: 18),
-                                                ),
-                                                SizedBox(height: 5),
-                                                Text(
-                                                  'Price: \$${product.price.toStringAsFixed(2)}',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
+                                                  child: Image.network(
+                                                    product.image,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return Icon(Icons.image,
+                                                          size: 60,
+                                                          color: Colors.grey);
+                                                    },
                                                   ),
                                                 ),
-                                                SizedBox(height: 5),
-                                                Text(
-                                                  'Quantity: ${product.quantity}',
-                                                  style:
-                                                      TextStyle(fontSize: 18),
-                                                ),
-                                                SizedBox(height: 10),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    ElevatedButton.icon(
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.blueAccent,
-                                                        shadowColor:
-                                                            Colors.transparent,
-                                                      ),
-                                                      onPressed: () =>
-                                                          _navigateToUpdateCart(
-                                                              product),
-                                                      icon: Icon(
-                                                        Icons.edit,
-                                                        color: Colors.white,
-                                                      ),
-                                                      label: Text(
-                                                        'Update',
+                                                SizedBox(width: 10),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        product.name,
                                                         style: TextStyle(
-                                                          color: Colors.white,
+                                                          fontSize: isLandscape
+                                                              ? 16
+                                                              : 20, // Adjust font size
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.start,
+                                                      ),
+                                                      SizedBox(height: 5),
+                                                      Text(
+                                                        'Color: ${product.color}',
+                                                        style: TextStyle(
+                                                            fontSize: isLandscape
+                                                                ? 16
+                                                                : 20), // Adjust font size
+                                                      ),
+                                                      SizedBox(height: 5),
+                                                      Text(
+                                                        'Price: \$${product.price.toStringAsFixed(2)}',
+                                                        style: TextStyle(
+                                                          fontSize: isLandscape
+                                                              ? 16
+                                                              : 20, // Adjust font size
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
-                                                    ),
-                                                    SizedBox(width: 10),
-                                                    ElevatedButton.icon(
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.redAccent,
-                                                        shadowColor:
-                                                            Colors.transparent,
-                                                      ),
-                                                      onPressed: () {
-                                                        _removeCartItem(
-                                                            product.cartItemId);
-                                                      },
-                                                      icon: Icon(
-                                                        Icons.delete,
-                                                        color: Colors.white,
-                                                      ),
-                                                      label: Text(
-                                                        'Delete',
+                                                      SizedBox(height: 5),
+                                                      Text(
+                                                        'Quantity: ${product.quantity}',
                                                         style: TextStyle(
-                                                          color: Colors.white,
-                                                        ),
+                                                            fontSize: isLandscape
+                                                                ? 16
+                                                                : 20), // Adjust font size
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(height: 10),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Expanded(
+                                                  child: ElevatedButton.icon(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.blueAccent,
+                                                      shadowColor:
+                                                          Colors.transparent,
+                                                    ),
+                                                    onPressed: () =>
+                                                        _navigateToUpdateCart(
+                                                            product),
+                                                    icon: Icon(
+                                                      Icons.edit,
+                                                      color: Colors.white,
+                                                    ),
+                                                    label: Text(
+                                                      'Update',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10),
+                                                Expanded(
+                                                  child: ElevatedButton.icon(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.redAccent,
+                                                      shadowColor:
+                                                          Colors.transparent,
+                                                    ),
+                                                    onPressed: () {
+                                                      _removeCartItem(
+                                                          product.cartItemId);
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.delete,
+                                                      color: Colors.white,
+                                                    ),
+                                                    label: Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -290,10 +320,8 @@ class _CartScreenState extends State<CartScreen> {
                                       style: TextStyle(
                                         color: Theme.of(context).brightness ==
                                                 Brightness.dark
-                                            ? Colors
-                                                .white // White text for dark mode
-                                            : Colors
-                                                .black, // Black text for light mode
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
