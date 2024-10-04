@@ -12,6 +12,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final ApiService apiService = ApiService();
   String name = '';
   String email = '';
+  String bio = 'A passionate user of our services!'; // Sample bio
+  String profileImage =
+      'https://via.placeholder.com/150'; // Sample profile image
 
   @override
   void initState() {
@@ -25,6 +28,9 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         name = profile['name'];
         email = profile['email'];
+        bio = profile['bio'] ?? bio; // Assuming 'bio' can be fetched
+        profileImage = profile['profileImage'] ??
+            profileImage; // Assuming 'profileImage' can be fetched
       });
     } catch (e) {
       print(e);
@@ -43,8 +49,9 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              UpdateProfilePage(currentName: name, currentEmail: email)),
+        builder: (context) =>
+            UpdateProfilePage(currentName: name, currentEmail: email),
+      ),
     );
   }
 
@@ -57,30 +64,119 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Profile Image
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(profileImage),
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Welcome message
+            Text(
+              'Welcome, $name!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+
+            // Bio
+            Card(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.info, size: 30),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bio',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            bio,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Divider
+            Divider(height: 20, thickness: 1),
+
             // Display the customer's name
-            Text(
-              'Name: $name',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text(
+                'Name',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(name, style: TextStyle(fontSize: 16)),
             ),
-            SizedBox(height: 8),
+
+            // Divider
+            Divider(height: 20, thickness: 1),
+
             // Display the customer's email
-            Text(
-              'Email: $email',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ListTile(
+              leading: Icon(Icons.email),
+              title: Text(
+                'Email',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(email, style: TextStyle(fontSize: 16)),
             ),
+
             SizedBox(height: 20),
+
+            // Divider
+            Divider(height: 20, thickness: 1),
+
             // Button to navigate to the Update Profile screen
-            ElevatedButton(
-              onPressed: _navigateToUpdateProfile,
-              child: Text('Update Profile'),
+            Container(
+              padding:
+                  EdgeInsets.only(left: 16.0), // Move the button to the right
+              child: ListTile(
+                leading: Icon(Icons.edit),
+                title: Text('Update Profile'),
+                onTap: _navigateToUpdateProfile,
+                tileColor:
+                    Colors.white12, // Light background color for the button
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 16.0),
+              ),
             ),
-            SizedBox(height: 20),
+
+            // Divider
+            Divider(height: 20, thickness: 1),
+
             // Logout button
-            ElevatedButton(
-              onPressed: _logout,
-              child: Text('Logout'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Customize your button color
+            Container(
+              padding:
+                  EdgeInsets.only(left: 16.0), // Move the button to the right
+              child: ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('Logout'),
+                onTap: _logout,
+                tileColor:
+                    Colors.white12, // Light background color for the button
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 16.0),
               ),
             ),
           ],
