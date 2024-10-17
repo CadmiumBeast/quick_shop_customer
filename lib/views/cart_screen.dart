@@ -1,4 +1,6 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../models/Product.dart';
 import '../services/api_service.dart';
 import '../services/stripe_service.dart';
@@ -12,6 +14,8 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final ApiService _apiService = ApiService();
   List<Product> _cartItems = [];
+  List<Contact> _contacts = [];
+  Contact? selectedContact;
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -32,7 +36,7 @@ class _CartScreenState extends State<CartScreen> {
             name: tshirt['name'],
             color: tshirt['color'],
             size: tshirt['size'],
-            price: double.parse(tshirt['price']),
+            price: tshirt['price'],
             stock: tshirt['stock'],
             quantity: item['quantity'],
             description: tshirt['description'],
@@ -114,13 +118,36 @@ class _CartScreenState extends State<CartScreen> {
       });
     }
   }
+  //Contacts
+  Future<bool> _requestPermission() async {
+    PermissionStatus status = await Permission.contacts.request();
+    print("Permission status: $status");
+    return status.isGranted;
+  }
+  Future<void> _fetchContacts() async {
+    try {
+      if (await _requestPermission()) {
+        Iterable<Contact> contacts = await ContactsService.getContacts();
+        setState(() {
+          _contacts = contacts.toList();
+        });
+        print('Contacts: ${_contacts.length}');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Permission denied to access contacts.')),
+        );
+      }
+    } catch (e) {
+      print('Error fetching contacts: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching contacts: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Cart'),
-      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage != null
@@ -156,7 +183,7 @@ class _CartScreenState extends State<CartScreen> {
                                       child: Padding(
                                         padding: EdgeInsets.all(isLandscape
                                             ? 8.0
-                                            : 16.0), // Adjust padding
+                                            : 12.0), // Adjust padding
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -203,6 +230,7 @@ class _CartScreenState extends State<CartScreen> {
                                                               : 20, // Adjust font size
                                                           fontWeight:
                                                               FontWeight.bold,
+                                                          color: Colors.black,
                                                         ),
                                                         textAlign:
                                                             TextAlign.start,
@@ -213,7 +241,9 @@ class _CartScreenState extends State<CartScreen> {
                                                         style: TextStyle(
                                                             fontSize: isLandscape
                                                                 ? 16
-                                                                : 20), // Adjust font size
+                                                                : 20,
+                                                          color: Colors.black,),
+                                                        // Adjust font size
                                                       ),
                                                       SizedBox(height: 5),
                                                       Text(
@@ -224,6 +254,7 @@ class _CartScreenState extends State<CartScreen> {
                                                               : 20, // Adjust font size
                                                           fontWeight:
                                                               FontWeight.bold,
+                                                          color: Colors.green,
                                                         ),
                                                       ),
                                                       SizedBox(height: 5),
@@ -232,7 +263,9 @@ class _CartScreenState extends State<CartScreen> {
                                                         style: TextStyle(
                                                             fontSize: isLandscape
                                                                 ? 16
-                                                                : 20), // Adjust font size
+                                                                : 20,
+                                                          color: Colors.black,
+                                                        ), // Adjust font size
                                                       ),
                                                     ],
                                                   ),
@@ -303,18 +336,44 @@ class _CartScreenState extends State<CartScreen> {
                                   },
                                 ),
                               ),
+                              Container(
+                                padding: const EdgeInsets.all(5.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20)
+                                ),
+
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    if (_contacts.isNotEmpty) {
+                                      _showContactsDialog(); // Display contacts in a dialog for selection
+                                    } else {
+                                      _fetchContacts(); // Fetch contacts if not already fetched
+                                    }
+                                  },
+                                  icon: const Icon(Icons.contacts, color: Colors.black),
+                                  label: Text(
+                                    selectedContact != null
+                                        ? selectedContact!.displayName ?? 'No Name'
+                                        : 'Select Contact',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Center(
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
+                                      backgroundColor: Colors.amber,
                                     ),
                                     onPressed: _cartItems.isEmpty
                                         ? null
                                         : _purchaseItems,
                                     icon: Icon(Icons.shopping_cart,
-                                        color: Colors.white),
+                                        color: Colors.black),
                                     label: Text(
                                       'Purchase',
                                       style: TextStyle(
@@ -332,6 +391,33 @@ class _CartScreenState extends State<CartScreen> {
                         );
                       },
                     ),
+    );
+  }
+  void _showContactsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Select Contact'),
+          content: SizedBox(
+            height: 300,
+            child: ListView.builder(
+              itemCount: _contacts.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_contacts[index].displayName ?? ''),
+                  onTap: () {
+                    setState(() {
+                      selectedContact = _contacts[index];
+                    });
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Product.dart';
 
 class ApiService {
-  final String baseUrl = 'http://192.168.8.169:8000/api';
+  final String baseUrl = 'http://10.0.2.2:8000/api';
 
   // Helper function to get the token from SharedPreferences
   Future<String?> getToken() async {

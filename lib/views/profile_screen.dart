@@ -1,36 +1,51 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
-import 'login_screen.dart'; // Ensure to import your LoginScreen
-import 'update_profile_screen.dart'; // Ensure to import your new UpdateProfilePage
+import 'login_screen.dart';
+import 'update_profile_screen.dart';
 
 class ProfilePage extends StatefulWidget {
+  final File? profileImage; // Receive the profile image
+  final Function(File) onImagePicked;
+
+  const ProfilePage({
+    Key? key,
+    required this.profileImage,
+    required this.onImagePicked,
+  }) : super(key: key);
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   final ApiService apiService = ApiService();
-  String name = '';
-  String email = '';
-  String bio = 'A passionate user of our services!'; // Sample bio
-  String profileImage =
-      'https://via.placeholder.com/150'; // Sample profile image
+  String name = 'Rifkhan Faris'; // Sample name based on the design
+  String profileImage = 'https://via.placeholder.com/150';
+  String email = 'No Mail Found';
+  File? _profileImage; // Local image to be displayed
+  String _address = 'Searching...'; // Store user location
+  String _currentpostion = '';
 
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    _getCurrentLocation(); // Fetch user location when the screen loads
+    _profileImage = widget.profileImage;
   }
 
   Future<void> _loadProfile() async {
     try {
       final profile = await apiService.fetchProfile();
       setState(() {
-        name = profile['name'];
         email = profile['email'];
-        bio = profile['bio'] ?? bio; // Assuming 'bio' can be fetched
-        profileImage = profile['profileImage'] ??
-            profileImage; // Assuming 'profileImage' can be fetched
+        name = profile['name'];
+        profileImage = profile['profileImage'] ?? profileImage;
       });
     } catch (e) {
       print(e);
@@ -44,160 +59,248 @@ class _ProfilePageState extends State<ProfilePage> {
       MaterialPageRoute(builder: (context) => LoginScreen()),
     );
   }
+  Future<void> _pickImageFromProfile() async {
+    final ImagePicker _picker = ImagePicker();
 
-  void _navigateToUpdateProfile() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            UpdateProfilePage(currentName: name, currentEmail: email),
-      ),
+    // Show dialog to select image source
+    final String? source = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Image Source'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'Camera'),
+              child: Text('Camera'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'Gallery'),
+              child: Text('Gallery'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
     );
+
+    if (source == 'Camera') {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+      _updateProfileImage(pickedFile);
+    } else if (source == 'Gallery') {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      _updateProfileImage(pickedFile);
+    }
+  }
+
+// Helper method to update the profile image
+  void _updateProfileImage(XFile? pickedFile) {
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path); // Update local image
+      });
+      widget.onImagePicked(File(pickedFile.path)); // Notify parent of new image
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location services are disabled')),
+      );
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location permissions are permanently denied, we cannot request permissions')),
+      );
+      return;
+    }
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Location permissions are denied (actual value: $permission).')),
+        );
+        return;
+      }
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _currentpostion =
+      'Lat: ${position.latitude}, Long: ${position.longitude}';
+    });
+
+    await _getAddressFromLatLng(position);
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark place = placemarks[0];
+      setState(() {
+        _address = '${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}';
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error getting address: ${e.toString()}')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode =
-        Theme.of(context).brightness == Brightness.dark; // Check for dark mode
-    final screenSize = MediaQuery.of(context).size;
-    final isLandscape =
-        screenSize.width > screenSize.height; // Check if in landscape mode
-    final profileImageRadius =
-        isLandscape ? 40.0 : 50.0; // Adjust the radius based on orientation
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        // Wrap Column in SingleChildScrollView
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: SingleChildScrollView( // Added scrollable behavior
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Add space at the top of the screen
-              SizedBox(height: 40), // Adjust height as needed
+              SizedBox(height: 40), // Spacing at the top
 
-              // Profile Image
-              Center(
-                child: CircleAvatar(
-                  radius: profileImageRadius,
-                  backgroundImage: NetworkImage(profileImage),
-                ),
-              ),
-              SizedBox(height: 20),
-
-              // Welcome message
-              Text(
-                'Welcome, $name!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20),
-
-              // Bio
-              Card(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                color: Theme.of(context).cardColor, // Use theme color
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info, size: 30),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bio',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              bio,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
+              // Profile Picture and Edit Icon
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Stack(
+                  children: <Widget>[
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                      child: _profileImage == null ? Icon(Icons.person, size: 40) : null,
+                    ),
+                    Positioned(
+                      bottom: -5,
+                      right: -5,
+                      child: IconButton(
+                        icon: Icon(Icons.camera_alt),
+                        onPressed: _pickImageFromProfile,
+                        color: Colors.amber,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.white),
+                          shape: MaterialStateProperty.all(CircleBorder()),
                         ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+              SizedBox(height: 16),
+
+              // Name
+              Center(
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-
-              // Divider
-              Divider(height: 20, thickness: 1),
-
-              // Display the customer's name
-              ListTile(
-                leading: Icon(Icons.person),
-                title: Text(
-                  'Name',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.pin_drop, size: 20),
+                    SizedBox(width: 10),
+                    Expanded(  // Ensure the text takes only the available space
+                      child: Text(
+                        _address, // Display the address
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                subtitle: Text(name, style: TextStyle(fontSize: 16)),
               ),
-
-              // Divider
-              Divider(height: 20, thickness: 1),
-
-              // Display the customer's email
+              // Options (Notifications, Dark Mode, etc.)
               ListTile(
-                leading: Icon(Icons.email),
-                title: Text(
-                  'Email',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                title: Text('Notifications',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                trailing: Switch(
+                  value: false,
+                  onChanged: (val) {
+                    // Handle notifications toggle
+                  },
                 ),
-                subtitle: Text(email, style: TextStyle(fontSize: 16)),
               ),
+              ListTile(
+                title: Text('Dark Mode',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                trailing: Switch(
+                  value: isDarkMode,
+                  onChanged: (val) {
+                    // Handle dark mode toggle
+                  },
+                ),
+              ),
+              ListTile(
+                title: Text('Update Profile',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                trailing: Icon(Icons.edit, color: Colors.yellow),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UpdateProfilePage(currentName: name, currentEmail: email, profileImage: _profileImage,)), // Navigate to update profile
+                  );
+                },
+              ),
+              ListTile(
+                title: Text('Language',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                trailing: Icon(Icons.language, color: Colors.yellow),
+              ),
+              ListTile(
+                title: Text('Help',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                trailing: Icon(Icons.help, color: Colors.yellow),
+              ),
+              SizedBox(height: 24),
 
+              // Sign Out button
+              Center(
+                child: TextButton(
+                  onPressed: _logout,
+                  child: Text(
+                    'Sign Out',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
-
-              // Divider
-              Divider(height: 20, thickness: 1),
-
-              // Button to navigate to the Update Profile screen
-              Container(
-                padding: EdgeInsets.only(left: 16.0),
-                child: ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('Update Profile'),
-                  onTap: _navigateToUpdateProfile,
-                  tileColor: isDarkMode
-                      ? Colors.black
-                      : Colors.white, // Button background color
-                  textColor: isDarkMode
-                      ? Colors.white
-                      : Colors.black, // Button text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 16.0),
-                ),
-              ),
-
-              // Divider
-              Divider(height: 20, thickness: 1),
-
-              // Logout button
-              Container(
-                padding: EdgeInsets.only(left: 16.0),
-                child: ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Logout'),
-                  onTap: _logout,
-                  tileColor: isDarkMode
-                      ? Colors.black
-                      : Colors.white, // Button background color
-                  textColor: isDarkMode
-                      ? Colors.white
-                      : Colors.black, // Button text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 16.0),
-                ),
-              ),
             ],
           ),
         ),

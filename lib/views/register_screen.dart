@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quick_shop_customer/widget/topwaveclipper.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
 
@@ -45,176 +46,186 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     // Get the width and height of the screen
     final screenWidth = MediaQuery.of(context).size.width;
-
+    final screenHeight = MediaQuery.of(context).size.height;
+    
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, // Adapt background color
       body: SingleChildScrollView(
         // Make the body scrollable
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          // Center the column in the body
-          child: Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center, // Center content vertically
-            children: [
-              Container(
-                width: screenWidth *
-                    0.25, // Set width to a percentage of the screen width
-                height: screenWidth *
-                    0.25, // Keep height proportional to width for circular shape
-                child: ClipOval(
-                  child: Image.network(
-                    'https://static.vecteezy.com/system/resources/previews/022/927/277/non_2x/clothing-store-logo-design-inspiration-cloth-shop-logo-clothes-logo-illustration-vector.jpg', // Logo URL
-                    fit: BoxFit.cover, // Ensures the image covers the circle
-                  ),
+        child: Stack(
+          children: [
+            SizedBox(width: screenWidth,),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: ClipPath(
+                clipper: TopWaveClipper(),
+                child: Container(
+                  color: Colors.yellow,
+                  height: 120, // Adjust height as needed
                 ),
               ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.9, // Set a width for the text fields
-                child: TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    labelStyle: TextStyle(
-                        color: theme.textTheme.bodyLarge
-                            ?.color), // Adapt label text color
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme.textTheme.bodyLarge?.color ??
-                              Colors.grey), // Adapt border color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme
-                              .primaryColor), // Primary color for focused border
+            ),
+
+            Padding(padding: 
+            EdgeInsets.all(20.00),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                  SizedBox(height: 120,),
+                  Center(
+                    child: Text(
+                      'Create Your Account',
+                      style: TextStyle(
+                        color: Colors.yellow,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  style: TextStyle(
-                      color:
-                          theme.textTheme.bodyLarge?.color), // Adapt text color
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.9, // Set a width for the text fields
-                child: TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(
-                        color: theme.textTheme.bodyLarge
-                            ?.color), // Adapt label text color
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme.textTheme.bodyLarge?.color ??
-                              Colors.grey), // Adapt border color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme
-                              .primaryColor), // Primary color for focused border
+                  Center(
+                    child: Text(
+                      'lets get started with your RetailFusion account',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                  style: TextStyle(
-                      color:
-                          theme.textTheme.bodyLarge?.color), // Adapt text color
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.9, // Set a width for the text fields
-                child: TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(
-                        color: theme.textTheme.bodyLarge
-                            ?.color), // Adapt label text color
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme.textTheme.bodyLarge?.color ??
-                              Colors.grey), // Adapt border color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme
-                              .primaryColor), // Primary color for focused border
+                  SizedBox(height: 100),
+                  Text(
+                    'Name',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
                     ),
                   ),
-                  obscureText: true,
-                  style: TextStyle(
-                      color:
-                          theme.textTheme.bodyLarge?.color), // Adapt text color
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: screenWidth * 0.9, // Set a width for the text fields
-                child: TextField(
-                  controller: _passwordConfirmController,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: TextStyle(
-                        color: theme.textTheme.bodyLarge
-                            ?.color), // Adapt label text color
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme.textTheme.bodyLarge?.color ??
-                              Colors.grey), // Adapt border color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: theme
-                              .primaryColor), // Primary color for focused border
+                  TextField(
+                    controller: _nameController,
+                    
+                   decoration: InputDecoration(
+                      filled: true,
+                      hintText: 'Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                     ),
                   ),
-                  obscureText: true,
-                  style: TextStyle(
-                      color:
-                          theme.textTheme.bodyLarge?.color), // Adapt text color
-                ),
-              ),
-              SizedBox(height: 20),
-              if (_errorMessage != null)
-                Text(
-                  _errorMessage!,
-                  style: TextStyle(color: Colors.red),
-                ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _register,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme
-                      .primaryColor, // Use primary color for button background
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25), // Rounded corners
+                  Text(
+                    'Email',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                child: Text(
-                  'Register',
-                  style: TextStyle(
-                      color: isDarkMode
-                          ? Colors.black
-                          : Colors.white), // Adapt button text color
-                ),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      hintText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Password',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      filled: true,
+                      hintText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Confirm Password',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  TextField(
+                    controller: _passwordConfirmController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      filled: true,
+                      hintText: 'Confirm Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  
+                  if (_errorMessage != null)
+                    Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+
+                  SizedBox(height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _register();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Colors.yellow, // Button background color
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                      ),
+                      ),
+                    ),
+
+                  SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Already have an account?',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                          );
+                        },
+                        child: Text(
+                          'Sign In',
+                          style: TextStyle(
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
-                },
-                child: Text(
-                  'Already have an account? Login',
-                  style: TextStyle(
-                      color:
-                          theme.textTheme.bodyLarge?.color), // Adapt text color
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

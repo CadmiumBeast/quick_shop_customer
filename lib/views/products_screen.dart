@@ -62,34 +62,8 @@ class _ProductsScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(26.0, 44.0, 26.0, 16.0),
-          child: _buildSearchBar(products),
-        ),
-        SizedBox(height: 16.0),
-        CarouselSlider(
-          options: CarouselOptions(
-            height: 250.0,
-            autoPlay: true,
-            aspectRatio: 16 / 9,
-            viewportFraction: 1.0,
-          ),
-          items: _buildCarouselItems(products, isDarkMode),
-        ),
-        SizedBox(height: 16.0),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            'Products',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.w500,
-              color: theme.textTheme.bodyLarge?.color,
-            ),
-          ),
-        ),
         Expanded(
-          child: _buildProductGrid(isDarkMode),
+          child: _buildProductList(isDarkMode),
         ),
       ],
     );
@@ -122,7 +96,7 @@ class _ProductsScreenState extends State<HomeScreen> {
         ),
         Expanded(
           flex: 2,
-          child: _buildProductGrid(isDarkMode),
+          child: _buildProductList(isDarkMode),
         ),
       ],
     );
@@ -132,12 +106,14 @@ class _ProductsScreenState extends State<HomeScreen> {
   Widget _buildSearchBar(List<Product> products) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme
+            .of(context)
+            .cardColor,
         borderRadius: BorderRadius.circular(25.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
+            color: Colors.black12, // Reduced shadow intensity for modern look
+            blurRadius: 5.0,
             offset: Offset(0, 2),
           ),
         ],
@@ -145,9 +121,13 @@ class _ProductsScreenState extends State<HomeScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Search...',
-          hintStyle: TextStyle(color: Theme.of(context).hintColor),
-          prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColor),
+          hintText: 'Search products...',
+          hintStyle: TextStyle(color: Theme
+              .of(context)
+              .hintColor),
+          prefixIcon: Icon(Icons.search, color: Theme
+              .of(context)
+              .primaryColor),
           border: InputBorder.none,
           contentPadding: EdgeInsets.all(15.0),
         ),
@@ -155,7 +135,7 @@ class _ProductsScreenState extends State<HomeScreen> {
           setState(() {
             _filteredProducts = products
                 .where((product) =>
-                    product.name.toLowerCase().contains(value.toLowerCase()))
+                product.name.toLowerCase().contains(value.toLowerCase()))
                 .toList();
           });
         },
@@ -170,11 +150,15 @@ class _ProductsScreenState extends State<HomeScreen> {
       return Builder(
         builder: (BuildContext context) {
           return Container(
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
             margin: EdgeInsets.symmetric(horizontal: 5.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
-              color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+              color: isDarkMode ? Colors.grey[800] : Colors
+                  .grey[200], // Updated colors
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -191,7 +175,7 @@ class _ProductsScreenState extends State<HomeScreen> {
                 Text(
                   product.name,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18, // Adjusted text size for better balance
                     fontWeight: FontWeight.bold,
                     color: theme.textTheme.bodyLarge?.color,
                   ),
@@ -205,16 +189,10 @@ class _ProductsScreenState extends State<HomeScreen> {
   }
 
   // Build Product Grid
-  Widget _buildProductGrid(bool isDarkMode) {
+  Widget _buildProductList(bool isDarkMode) {
     final theme = Theme.of(context);
-    return GridView.builder(
+    return ListView.builder(
       padding: const EdgeInsets.all(10),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.7,
-      ),
       itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
         final product = _filteredProducts[index];
@@ -229,57 +207,69 @@ class _ProductsScreenState extends State<HomeScreen> {
             );
           },
           child: Card(
-            elevation: 5,
+            elevation: 3,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
+              side: BorderSide(
+                color: Colors.grey, // Border color
+                width: 1.0, // Border thickness
+              ),
             ),
-            color: theme.cardColor,
+            color: Colors.transparent, // Transparent background
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: 100,
+                    // Adjust the width for the image
+                    height: 100,
+                    // Adjust the height for the image
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    ),
+                    child: Image.network(
+                      product.image,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.image, size: 60, color: Colors.grey);
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 10),
                   Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                      ),
-                      child: Image.network(
-                        product.image,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.image,
-                              size: 120, color: Colors.grey);
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    product.name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textTheme.bodyLarge?.color,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Color: ${product.color} | Size: ${product.size}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.textTheme.bodyLarge?.color,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textTheme.bodyLarge?.color,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Color: ${product.color} | Size: ${product.size}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '\$${product.price.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -291,3 +281,4 @@ class _ProductsScreenState extends State<HomeScreen> {
     );
   }
 }
+

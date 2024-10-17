@@ -48,8 +48,9 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Update Cart'),
+      appBar:  AppBar(
+        title: const Text('RetailFusion'),
+        backgroundColor: Colors.yellow, // Change app bar color
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -81,7 +82,7 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: Icon(Icons.remove, color: Colors.amber,),
                         onPressed: () {
                           if (_quantity > 1) {
                             setState(() {
@@ -92,7 +93,7 @@ class _UpdateCartScreenState extends State<UpdateCartScreen> {
                       ),
                       Text('$_quantity', style: TextStyle(fontSize: 18)),
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: Icon(Icons.add, color: Colors.amber,),
                         onPressed: () {
                           setState(() {
                             _quantity++;
